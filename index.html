@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Paketleme Kalite Kontrol Formu</title>
+    <meta name="description" content="Paketleme kalite kontrol takip ve raporlama sistemi">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kalite Kontrol">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Kalite Kontrol">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <!-- Fonts & Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>İşlem yapılıyor...</p>
+        </div>
+    </div>
+
+    <!-- Success/Error Toast -->
+    <div id="toast" class="toast hidden">
+        <div class="toast-content">
+            <span class="toast-icon"></span>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4" />
+                        <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h1>Paketleme Kalite Kontrol Formu</h1>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="form">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    Veri Girişi
+                </button>
+                <button class="nav-tab" data-tab="records">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Kayıt Sorgula
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Form Tab -->
+        <section id="formTab" class="tab-content active">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Yeni Paketleme Kalite Kontrol Kaydı</h2>
+                    <p>Hattın anlık kalite verilerini güvenle kaydedin</p>
+                </div>
+
+                <form id="qualityControlForm" class="quality-form">
+                    <!-- Row 1: Date & Machine -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tarih">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                                Tarih
+                            </label>
+                            <input type="text" id="tarih" name="tarih" class="flatpickr-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="makine">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="6" width="20" height="12" rx="2" />
+                                    <path d="M12 12h.01" />
+                                </svg>
+                                Makine
+                            </label>
+                            <select id="makine" name="makine" required>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: PO & SKU -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="po">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                </svg>
+                                PO (Sipariş No)
+                            </label>
+                            <input type="text" id="po" name="po" placeholder="Sipariş numarasını girin" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sku">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                                </svg>
+                                SKU (Ürün Kodu)
+                            </label>
+                            <input type="text" id="sku" name="sku" placeholder="Ürün kodunu girin" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Error Type -->
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label for="hata">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                                Hata Türü
+                            </label>
+                            <select id="hata" name="hata">
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Error Description -->
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label for="hataAciklama">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                                Hata Açıklaması
+                            </label>
+                            <textarea id="hataAciklama" name="hataAciklama" rows="3"
+                                placeholder="Hatayı detaylı açıklayın..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Error Image -->
+                    <div class="form-row single">
+                        <div class="form-group file-upload-group">
+                            <label for="hataGorsel">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                                Hata Görseli
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="hataGorsel" name="hataGorsel" accept="image/*"
+                                    class="file-input">
+                                <div class="file-upload-placeholder">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                    <span>Görsel yüklemek için tıklayın veya sürükleyin</span>
+                                    <small>PNG, JPG, JPEG (Max 5MB)</small>
+                                </div>
+                                <div class="file-preview hidden">
+                                    <img id="imagePreview" src="" alt="Önizleme">
+                                    <button type="button" class="remove-file-btn" id="removeImage">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Personnel -->
+                    <div class="form-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>Personel Bilgileri</span>
+                    </div>
+
+                    <div class="form-row triple">
+                        <div class="form-group">
+                            <label for="kefe">Kefe</label>
+                            <select id="kefe" name="kefe" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sayim">Sayım</label>
+                            <select id="sayim" name="sayim" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="veriGiris">Veri Giriş</label>
+                            <select id="veriGiris" name="veriGiris" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row double">
+                        <div class="form-group">
+                            <label for="sorumlu">Sorumlu</label>
+                            <select id="sorumlu" name="sorumlu" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="kaliteKontrol">Kalite Kontrol</label>
+                            <select id="kaliteKontrol" name="kaliteKontrol" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="resetForm">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="1 4 1 10 7 10" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            </svg>
+                            Temizle
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 2L11 13" />
+                                <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                            Kaydet ve Gönder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Records Tab -->
+        <section id="recordsTab" class="tab-content">
+            <div class="records-container">
+                <div class="records-header">
+                    <h2>Kayıt Sorgulama</h2>
+                    <p>Tarih ve makine seçerek geçmiş kayıtları görüntüleyin</p>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="filterTarih">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            Tarih
+                        </label>
+                        <input type="text" id="filterTarih" class="flatpickr-input" placeholder="Tarih seçin">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterMakine">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="6" width="20" height="12" rx="2" />
+                                <path d="M12 12h.01" />
+                            </svg>
+                            Makine
+                        </label>
+                        <select id="filterMakine">
+                            <option value="">Tümü</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="searchBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Ara
+                    </button>
+                </div>
+
+                <div class="records-stats hidden" id="recordsStats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalRecords">0</span>
+                            <span class="stat-label">Toplam Kayıt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="records-table-wrapper">
+                    <div class="empty-state" id="emptyState">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1">
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <h3>Kayıt Bulunamadı</h3>
+                        <p>Tarih ve makine seçerek arama yapın</p>
+                    </div>
+
+                    <table class="records-table hidden" id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Makine</th>
+                                <th>PO</th>
+                                <th>SKU</th>
+                                <th>Hata</th>
+                                <th>Açıklama</th>
+                                <th>Görsel</th>
+                                <th>Kefe</th>
+                                <th>Sayım</th>
+                                <th>Veri Giriş</th>
+                                <th>Sorumlu</th>
+                                <th>Kalite Kontrol</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Kalite Kontrol Sistemi. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <!-- Image Modal -->
+    <div class="modal hidden" id="imageModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+            <img id="modalImage" src="" alt="Hata Görseli">
+        </div>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="pwaInstallPrompt" class="pwa-install-prompt hidden">
+        <div class="pwa-install-content">
+            <div class="pwa-install-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+            </div>
+            <div class="pwa-install-text">
+                <strong>Uygulamayı Yükle</strong>
+                <span>Ana ekrana ekleyerek hızlıca erişin</span>
+            </div>
+            <button id="pwaInstallBtn" class="pwa-install-btn">Yükle</button>
+            <button id="pwaInstallClose" class="pwa-install-close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator hidden">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23" />
+            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+            <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+            <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+            <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <line x1="12" y1="20" x2="12.01" y2="20" />
+        </svg>
+        <span>Çevrimdışı Mod</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered successfully:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const pwaPrompt = document.getElementById('pwaInstallPrompt');
+        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        const pwaInstallClose = document.getElementById('pwaInstallClose');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install prompt after 3 seconds
+            setTimeout(() => {
+                pwaPrompt.classList.remove('hidden');
+            }, 3000);
+        });
+
+        pwaInstallBtn?.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('User choice:', outcome);
+                deferredPrompt = null;
+                pwaPrompt.classList.add('hidden');
+            }
+        });
+
+        pwaInstallClose?.addEventListener('click', () => {
+            pwaPrompt.classList.add('hidden');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            pwaPrompt.classList.add('hidden');
+        });
+
+        // Offline/Online detection
+        const offlineIndicator = document.getElementById('offlineIndicator');
+
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineIndicator?.classList.add('hidden');
+            } else {
+                offlineIndicator?.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+    </script>
+</body>
+
+</html>
