@@ -143,9 +143,9 @@ EMAIL_RECIPIENTS: 'yeni@email.com, diger@email.com'
 
 ## 📞 Destek
 
-Herhangi bir sorun için lütfen sistem yöneticinizle iletişime geçin.
+Herhangi bir sorun için lütfen benimle iletişime geçiniz.
 
 ---
 
 **Versiyon:** 1.0  
-**Son Güncelleme:** Aralık 2024
+**Son Güncelleme:** Ocak 2026
