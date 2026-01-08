@@ -445,35 +445,33 @@ function sendEmailNotification(formData, imageFile) {
     }
   }
 
-  // ✅ Alıcıları temizle + tek "to" string yap
+  // Alıcıları listeye çevir
   const recipients = CONFIG.EMAIL_RECIPIENTS
     .split(',')
     .map(e => e.trim())
     .filter(Boolean);
 
-  const to = recipients.join(',');
-  Logger.log('SENDING TO: ' + to);
-
-  // ✅ BOŞ body verme
-  const plainBody =
-    `Paketleme Kalite Kontrol kaydı oluşturuldu.\n` +
-    `Tarih: ${formData.tarih}\n` +
-    `Makine: ${formData.makine}\n` +
-    `PO: ${formData.po}\n` +
-    `SKU: ${formData.sku}\n` +
-    `Hata: ${formData.hata}`;
-
-  // ✅ MailApp genelde daha stabil
-  MailApp.sendEmail({
-    to: to,
-    subject: subject,
-    body: plainBody,
-    htmlBody: options.htmlBody,
-    attachments: options.attachments || [],
-    name: options.name
+  // Kaba Kuvvet Yöntemi: Herkese TEK TEK ayrı mail at
+  recipients.forEach(recipient => {
+    try {
+      Logger.log('Sending email to: ' + recipient);
+      
+      MailApp.sendEmail({
+        to: recipient,
+        subject: subject,
+        body: plainBody,
+        htmlBody: options.htmlBody,
+        attachments: options.attachments || [],
+        name: options.name
+      });
+      
+      Logger.log('SUCCESS: Email sent to ' + recipient);
+    } catch (e) {
+      Logger.log('ERROR: Could not send to ' + recipient + '. Error: ' + e.toString());
+    }
   });
 
-  Logger.log('MAIL SENT OK');
+  Logger.log('All email attempts finished.');
 }
 
 
