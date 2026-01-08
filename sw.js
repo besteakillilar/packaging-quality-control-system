@@ -1,5 +1,6 @@
 // Service Worker for Paketleme Kalite Kontrol PWA
-const CACHE_NAME = 'kalite-kontrol-v1';
+// Cache versiyonunu değiştirmek eski cache'i temizler
+const CACHE_NAME = 'kalite-kontrol-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -56,13 +57,13 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For API calls (Google Apps Script), always use network
-  if (event.request.url.includes('script.google.com') || 
-      event.request.url.includes('macros/s/')) {
+  if (event.request.url.includes('script.google.com') ||
+    event.request.url.includes('macros/s/')) {
     event.respondWith(
       fetch(event.request)
         .catch(() => {
-          return new Response(JSON.stringify({ 
-            error: 'Çevrimdışı moddasınız. İnternet bağlantınızı kontrol edin.' 
+          return new Response(JSON.stringify({
+            error: 'Çevrimdışı moddasınız. İnternet bağlantınızı kontrol edin.'
           }), {
             headers: { 'Content-Type': 'application/json' }
           });
@@ -71,7 +72,45 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For other requests, try cache first, then network
+  // Network First stratejisi - HTML, JS ve CSS dosyaları için
+  // Bu sayede uygulama her zaman güncel dosyaları almaya çalışır
+  const url = new URL(event.request.url);
+  const isAppFile = url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('/');
+
+  if (isAppFile) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Başarılı yanıtı cache'e kaydet
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Ağ bağlantısı yoksa cache'den al
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Navigasyon isteği ise index.html döndür
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+          });
+        })
+    );
+    return;
+  }
+
+  // For other requests (images, fonts, etc.), try cache first, then network
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

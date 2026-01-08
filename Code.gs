@@ -461,7 +461,9 @@ function sendEmailNotification(formData, imageFile) {
   `;
   
   const options = {
-    htmlBody: htmlBody
+    htmlBody: htmlBody,
+    from: 'packaging.qc.kalisan@gmail.com', // DİKKAT: Bu adresin Gmail ayarlarında "Takma ad" (Alias) olarak ekli olması gerekir.
+    name: 'Paketleme Kalite Kontrol'
   };
   
   // Attach image if present - orijinal formatında ekle (PDF dönüşümü desteklenmiyor)
