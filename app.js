@@ -503,9 +503,10 @@ async function fetchRecords(tarih, makine) {
         // JSONP-like approach using script tag callback
         const callbackName = 'handleSearchResponse_' + Date.now();
 
+        // 1. Callback fonksiyonunu global scope'a tanımla
         window[callbackName] = function (data) {
-            delete window[callbackName];
-            document.body.removeChild(script);
+            console.log('✅ Veri alındı:', data);
+            cleanup();
             resolve(data);
         };
 
@@ -518,26 +519,40 @@ async function fetchRecords(tarih, makine) {
 
         const script = document.createElement('script');
         script.src = `${SCRIPT_URL}?${params}`;
+        script.id = 'script_' + callbackName;
+
+        // Temizlik fonksiyonu
+        function cleanup() {
+            if (window[callbackName]) {
+                // Fonksiyonu silme, null yap (güvenlik için)
+                window[callbackName] = null;
+                try {
+                    delete window[callbackName];
+                } catch (e) { }
+            }
+            if (document.body.contains(script)) {
+                document.body.removeChild(script);
+            }
+        }
+
         script.onerror = () => {
-            delete window[callbackName];
-            document.body.removeChild(script);
+            console.error('❌ Script yükleme hatası (Network Error)');
+            cleanup();
             // Fallback: iframe yöntemi
             fetchRecordsViaIframe(tarih, makine).then(resolve).catch(reject);
         };
 
         document.body.appendChild(script);
 
-        // Timeout
+        // Timeout - 30 saniye (Google Apps Script bazen yavaş olabilir)
         setTimeout(() => {
             if (window[callbackName]) {
-                delete window[callbackName];
-                if (document.body.contains(script)) {
-                    document.body.removeChild(script);
-                }
+                console.warn('⚠️ Zaman aşımı (30sn):', callbackName);
+                cleanup();
                 // Fallback
                 fetchRecordsViaIframe(tarih, makine).then(resolve).catch(reject);
             }
-        }, 5000);
+        }, 30000);
     });
 }
 
