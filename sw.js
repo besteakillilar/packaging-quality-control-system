@@ -1,6 +1,6 @@
 // Service Worker for Paketleme Kalite Kontrol PWA
 // Cache versiyonunu değiştirmek eski cache'i temizler
-const CACHE_NAME = 'kalite-kontrol-v3';
+const CACHE_NAME = 'kalite-kontrol-v4';
 const urlsToCache = [
   './',
   './index.html',

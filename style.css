@@ -1021,6 +1021,7 @@ select[multiple].hidden-select {
         opacity: 0;
         transform: translateY(100%);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1182,7 +1183,8 @@ select[multiple].hidden-select {
     .form-group select,
     .form-group textarea {
         padding: 0.875rem 1rem;
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
+        /* Prevents zoom on iOS */
     }
 
     .filter-section {
@@ -1349,6 +1351,7 @@ select[multiple].hidden-select {
 
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
+
     .btn:hover,
     .nav-tab:hover {
         transform: none;

@@ -2,12 +2,12 @@
     "name": "Paketleme Kalite Kontrol Sistemi",
     "short_name": "Kalite Kontrol",
     "description": "Paketleme kalite kontrol takip ve raporlama sistemi",
-    "start_url": ".",
+    "start_url": "/packaging-quality-control-system/",
     "display": "standalone",
     "background_color": "#f8fafc",
     "theme_color": "#6366f1",
     "orientation": "any",
-    "scope": ".",
+    "scope": "/packaging-quality-control-system/",
     "lang": "tr",
     "icons": [
         {
