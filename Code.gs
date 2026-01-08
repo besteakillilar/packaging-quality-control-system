@@ -19,7 +19,7 @@ const CONFIG = {
   PERSONEL_SHEET_NAME: 'personel',
   MACHINES_SHEET_NAME: 'machines',
   DEFECT_SHEET_NAME: 'defect',
-  EMAIL_RECIPIENTS: 'besteakillilar@gmail.com, seda.sahintas@kalisan.com.tr', // Birden fazla alıcı için virgül ile ayırın: 'mail1@gmail.com, mail2@gmail.com'
+  EMAIL_RECIPIENTS: 'besteakillilar@gmail.com, besteak.kalisan@gmail.com', // Birden fazla alıcı için virgül ile ayırın: 'mail1@gmail.com, mail2@gmail.com'
   TIMEZONE: 'Europe/Istanbul'
 };
 
@@ -391,96 +391,91 @@ function saveImageToDrive(base64Data, po, sku) {
  */
 function sendEmailNotification(formData, imageFile) {
   const subject = `${formData.makine} - PO:${formData.po} - SKU: ${formData.sku} Kontrol Raporu`;
-  
+
   let htmlBody = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 20px; border-radius: 10px 10px 0 0;">
         <h1 style="margin: 0; font-size: 20px;"> Paketleme Kalite Kontrol Raporu</h1>
         <p style="margin: 5px 0 0; opacity: 0.9;">${formData.makine}</p>
       </div>
-      
+
       <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;">
         <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #475569;"> Tarih</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${formData.tarih}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #475569;"> Makine</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${formData.makine}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #475569;"> PO</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${formData.po}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #475569;"> SKU</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${formData.sku}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #ef4444;">⚠️ Hata</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #ef4444; font-weight: bold;">${formData.hata}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #475569;"> Açıklama</td>
-            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${formData.hataAciklama || '-'}</td>
-          </tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Tarih</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.tarih}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Makine</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.makine}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> PO</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.po}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> SKU</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.sku}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ef4444;">⚠️ Hata</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#ef4444;font-weight:bold;">${formData.hata}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Açıklama</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.hataAciklama || '-'}</td></tr>
         </table>
-        
+
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
           <h3 style="color: #1e40af; margin: 0 0 15px;">Personel Bilgileri</h3>
           <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 8px 0; color: #475569; font-weight: 500;">Kefe:</td>
-              <td style="padding: 8px 0; color: #1e293b;">${formData.kefe}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #475569; font-weight: 500;">Sayım:</td>
-              <td style="padding: 8px 0; color: #1e293b;">${formData.sayim}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #475569; font-weight: 500;">Veri Giriş:</td>
-              <td style="padding: 8px 0; color: #1e293b;">${formData.veriGiris}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #475569; font-weight: 500;">Sorumlu:</td>
-              <td style="padding: 8px 0; color: #1e293b;">${formData.sorumlu}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; color: #475569; font-weight: 500;">Kalite Kontrol:</td>
-              <td style="padding: 8px 0; color: #1e293b;">${formData.kaliteKontrol}</td>
-            </tr>
+            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kefe:</td><td style="padding:8px 0;color:#1e293b;">${formData.kefe}</td></tr>
+            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sayım:</td><td style="padding:8px 0;color:#1e293b;">${formData.sayim}</td></tr>
+            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Veri Giriş:</td><td style="padding:8px 0;color:#1e293b;">${formData.veriGiris}</td></tr>
+            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sorumlu:</td><td style="padding:8px 0;color:#1e293b;">${formData.sorumlu}</td></tr>
+            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kalite Kontrol:</td><td style="padding:8px 0;color:#1e293b;">${formData.kaliteKontrol}</td></tr>
           </table>
         </div>
       </div>
-      
-      <div style="background: #1e293b; color: #94a3b8; padding: 15px; text-align: center; border-radius: 0 0 10px 10px; font-size: 12px;">
+
+      <div style="background:#1e293b;color:#94a3b8;padding:15px;text-align:center;border-radius:0 0 10px 10px;font-size:12px;">
         Bu e-posta Kalite Kontrol Sistemi tarafından otomatik olarak gönderilmiştir.
       </div>
     </div>
   `;
-  
+
   const options = {
     htmlBody: htmlBody,
-    from: 'packaging.qc.kalisan@gmail.com', // DİKKAT: Bu adresin Gmail ayarlarında "Takma ad" (Alias) olarak ekli olması gerekir.
     name: 'Paketleme Kalite Kontrol'
+    // ❌ from satırını kaldırıyoruz. Alias yoksa teslimatı bozabilir.
+    // from: 'packaging.qc.kalisan@gmail.com',
   };
-  
-  // Attach image if present - orijinal formatında ekle (PDF dönüşümü desteklenmiyor)
+
+  // Ek varsa
   if (imageFile) {
     try {
-      // Görseli olduğu gibi ekle (PNG, JPG vb.)
       options.attachments = [imageFile.getBlob()];
     } catch (attachError) {
       Logger.log('Attachment error: ' + attachError.toString());
-      // Görsel eklenemezse link olarak ekle
       htmlBody += '<p><strong>Görsel Link:</strong> <a href="' + imageFile.getUrl() + '">Görseli Görüntüle</a></p>';
       options.htmlBody = htmlBody;
     }
   }
-  
-  GmailApp.sendEmail(CONFIG.EMAIL_RECIPIENTS, subject, '', options);
+
+  // ✅ Alıcıları temizle + tek "to" string yap
+  const recipients = CONFIG.EMAIL_RECIPIENTS
+    .split(',')
+    .map(e => e.trim())
+    .filter(Boolean);
+
+  const to = recipients.join(',');
+  Logger.log('SENDING TO: ' + to);
+
+  // ✅ BOŞ body verme
+  const plainBody =
+    `Paketleme Kalite Kontrol kaydı oluşturuldu.\n` +
+    `Tarih: ${formData.tarih}\n` +
+    `Makine: ${formData.makine}\n` +
+    `PO: ${formData.po}\n` +
+    `SKU: ${formData.sku}\n` +
+    `Hata: ${formData.hata}`;
+
+  // ✅ MailApp genelde daha stabil
+  MailApp.sendEmail({
+    to: to,
+    subject: subject,
+    body: plainBody,
+    htmlBody: options.htmlBody,
+    attachments: options.attachments || [],
+    name: options.name
+  });
+
+  Logger.log('MAIL SENT OK');
 }
+
 
 /**
  * Create JSON response for web app

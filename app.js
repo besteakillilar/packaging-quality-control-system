@@ -2,7 +2,7 @@
 // Configuration - Google Apps Script Web App URL
 // ========================================
 // Bu URL'yi Google Apps Script'i deploy ettikten sonra güncelleyin
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyy_wk3mFESFdG3XEuKQhl2rZ8Cze-TtXI7ofE-NhO-yPMbbuBuGbLa6jL8E3xQJERDIg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3WZvLDE3mxHUIodABKcx7AJtI5cHHiFJwrUE7hESmed3YIzZujALJ_BhSTw9yuMXi/exec';
 
 // ========================================
 // 📋 DİNAMİK LİSTELER - Google Sheets'ten Yüklenir
