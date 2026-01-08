@@ -369,10 +369,27 @@ function setupMultiSelectDropdowns() {
 // ========================================
 // Event Listeners
 // ========================================
+// Pagination State
+let currentPage = 1;
+let rowsPerPage = 15;
+let currentRecords = [];
+
+// ========================================
+// Event Listeners (Updated)
+// ========================================
 function setupEventListeners() {
     // Tab Navigation
     elements.navTabs.forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        tab.addEventListener('click', () => {
+            switchTab(tab.dataset.tab);
+            // Tab değiştiğinde kayıtlar sekmesi ise otomatik yükle
+            if (tab.dataset.tab === 'records') {
+                // Sadece ilk seferde veya filtreler boşsa otomatik yükle
+                if (currentRecords.length === 0) {
+                    searchRecords(true);
+                }
+            }
+        });
     });
 
     // Form Submission
@@ -386,7 +403,16 @@ function setupEventListeners() {
     elements.removeImageBtn.addEventListener('click', removeImage);
 
     // Search Records
-    elements.searchBtn.addEventListener('click', searchRecords);
+    elements.searchBtn.addEventListener('click', () => searchRecords(false));
+
+    // Pagination Controls
+    document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+    document.getElementById('rowsPerPage').addEventListener('change', (e) => {
+        rowsPerPage = parseInt(e.target.value);
+        currentPage = 1;
+        renderPagination();
+    });
 
     // Modal
     elements.closeModal.addEventListener('click', closeImageModal);
@@ -401,302 +427,75 @@ function setupEventListeners() {
 }
 
 // ========================================
-// Tab Navigation
+// Records Search & Pagination
 // ========================================
-function switchTab(tabId) {
-    elements.navTabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tab === tabId);
-    });
-
-    elements.tabContents.forEach(content => {
-        content.classList.toggle('active', content.id === `${tabId}Tab`);
-    });
-}
-
-// ========================================
-// Form Handling
-// ========================================
-async function handleFormSubmit(e) {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    showLoading();
-
-    try {
-        const formData = collectFormData();
-
-        // DEBUG: Form verilerini konsola yazdır
-        console.log('=== FORM DATA ===');
-        console.log('Tarih:', formData.tarih);
-        console.log('Makine:', formData.makine);
-        console.log('PO:', formData.po);
-        console.log('SKU:', formData.sku);
-        console.log('Hata:', formData.hata);
-        console.log('Hata Açıklama:', formData.hataAciklama);
-        console.log('Kefe:', formData.kefe);
-        console.log('Sayım:', formData.sayim);
-        console.log('Veri Giriş:', formData.veriGiris);
-        console.log('Sorumlu:', formData.sorumlu);
-        console.log('Kalite Kontrol:', formData.kaliteKontrol);
-        console.log('Görsel var mı:', formData.hataGorsel ? 'Evet' : 'Hayır');
-        console.log('Full JSON:', JSON.stringify(formData));
-        console.log('=================');
-
-        // Simüle edilmiş API çağrısı (Google Apps Script entegrasyonu)
-        if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
-            // Demo modu - gerçek API bağlantısı yok
-            await simulateApiCall();
-            showToast('Kayıt başarıyla eklendi ve e-posta gönderildi!', 'success');
-            resetForm();
-        } else {
-            const response = await submitToGoogleSheets(formData);
-            if (response.success) {
-                showToast('Kayıt başarıyla eklendi ve e-posta gönderildi!', 'success');
-                resetForm();
-            } else {
-                showToast('Hata: ' + response.message, 'error');
-            }
-        }
-    } catch (error) {
-        console.error('Form submission error:', error);
-        showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
-    } finally {
-        hideLoading();
-    }
-}
-
-function validateForm() {
-    // Hata çıkmadığı durumlar için hata alanını ve personel alanlarını zorunlu tutmuyoruz
-    // Sadece kaydın temel kimliği olan alanlar zorunlu kalsın
-    const required = ['tarih', 'makine', 'po', 'sku'];
-    let isValid = true;
-
-    required.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (!field.value.trim()) {
-            field.style.borderColor = 'var(--error)';
-            isValid = false;
-        } else {
-            field.style.borderColor = '';
-        }
-    });
-
-    if (!isValid) {
-        showToast('Lütfen tüm zorunlu alanları doldurun.', 'error');
-    }
-
-    return isValid;
-}
-
-function collectFormData() {
-    const fileInput = elements.fileInput;
-    let imageData = null;
-
-    if (fileInput.files && fileInput.files[0]) {
-        imageData = elements.imagePreview.src;
-    }
-
-    const getSelectedValues = (id) => {
-        const select = document.getElementById(id);
-        if (!select) return '';
-
-        if (select.multiple) {
-            return Array.from(select.selectedOptions)
-                .map(option => option.value)
-                .filter(val => val !== '')
-                .join(', ');
-        }
-        return select.value;
-    };
-
-    return {
-        tarih: document.getElementById('tarih').value,
-        makine: document.getElementById('makine').value,
-        po: document.getElementById('po').value,
-        sku: document.getElementById('sku').value,
-        hata: document.getElementById('hata').value,
-        hataAciklama: document.getElementById('hataAciklama').value,
-        hataGorsel: imageData,
-        kefe: getSelectedValues('kefe'),
-        sayim: getSelectedValues('sayim'),
-        veriGiris: getSelectedValues('veriGiris'),
-        sorumlu: getSelectedValues('sorumlu'),
-        kaliteKontrol: getSelectedValues('kaliteKontrol')
-    };
-}
-
-async function submitToGoogleSheets(formData) {
-    return new Promise((resolve, reject) => {
-        // Google Apps Script için form data olarak gönderiyoruz
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = SCRIPT_URL;
-        form.target = 'hidden_iframe';
-        form.acceptCharset = 'UTF-8'; // Türkçe karakter desteği
-
-        let formRemoved = false; // Race condition önlemek için flag
-
-        // Her form alanını ayrı hidden input olarak ekle
-        const addHiddenInput = (name, value) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value || '';
-            form.appendChild(input);
-        };
-
-        // Action type
-        addHiddenInput('action', 'submit');
-
-        // Form alanları - ayrı ayrı gönder (görsel en sonda olmalı çünkü çok büyük olabilir)
-        addHiddenInput('tarih', formData.tarih);
-        addHiddenInput('makine', formData.makine);
-        addHiddenInput('po', formData.po);
-        addHiddenInput('sku', formData.sku);
-        addHiddenInput('hata', formData.hata);
-        addHiddenInput('hataAciklama', formData.hataAciklama);
-        addHiddenInput('kefe', formData.kefe);
-        addHiddenInput('sayim', formData.sayim);
-        addHiddenInput('veriGiris', formData.veriGiris);
-        addHiddenInput('sorumlu', formData.sorumlu);
-        addHiddenInput('kaliteKontrol', formData.kaliteKontrol);
-        // Görsel en sonda - büyük veri olduğu için diğer alanları etkilememeli
-        addHiddenInput('hataGorsel', formData.hataGorsel || '');
-
-        // Hidden iframe for response
-        let iframe = document.getElementById('hidden_iframe');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.id = 'hidden_iframe';
-            iframe.name = 'hidden_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
-
-        // Form'u güvenli bir şekilde kaldır
-        const removeForm = () => {
-            if (!formRemoved && form.parentNode) {
-                form.parentNode.removeChild(form);
-                formRemoved = true;
-            }
-        };
-
-        // Timeout for completion
-        const timeout = setTimeout(() => {
-            removeForm();
-            resolve({ success: true, message: 'Kayıt gönderildi' });
-        }, 5000); // 5 saniye timeout
-
-        iframe.onload = () => {
-            clearTimeout(timeout);
-            removeForm();
-            resolve({ success: true, message: 'Kayıt başarılı' });
-        };
-
-        document.body.appendChild(form);
-        form.submit();
-    });
-}
-
-function resetForm() {
-    elements.qualityForm.reset();
-    setDefaultDate();
-    removeImage();
-
-    // Reset border colors
-    elements.qualityForm.querySelectorAll('input, select').forEach(field => {
-        field.style.borderColor = '';
-    });
-
-    // Reset custom multi-selects
-    document.querySelectorAll('.multi-select-wrapper').forEach(wrapper => {
-        // Seçimleri kaldır
-        wrapper.querySelectorAll('.option-item.selected').forEach(item => {
-            item.classList.remove('selected');
-        });
-
-        // Trigger metnini sıfırla
-        const valueSpan = wrapper.querySelector('.multi-select-value');
-        if (valueSpan) {
-            valueSpan.textContent = 'Seçiniz...';
-            valueSpan.classList.add('placeholder');
-        }
-
-        // Arama kutusunu ve filtreleri sıfırla
-        const searchInput = wrapper.querySelector('.multi-select-search input');
-        if (searchInput) searchInput.value = '';
-
-        wrapper.querySelectorAll('.option-item.hidden').forEach(item => {
-            item.classList.remove('hidden');
-        });
-    });
-}
-
-// ========================================
-// File Upload Handling
-// ========================================
-function handleFileUpload(e) {
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-        showToast('Lütfen bir görsel dosyası seçin.', 'error');
-        return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('Dosya boyutu 5MB\'dan küçük olmalıdır.', 'error');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        elements.imagePreview.src = event.target.result;
-        elements.filePlaceholder.classList.add('hidden');
-        elements.filePreviewWrapper.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeImage() {
-    elements.fileInput.value = '';
-    elements.imagePreview.src = '';
-    elements.filePlaceholder.classList.remove('hidden');
-    elements.filePreviewWrapper.classList.add('hidden');
-}
-
-// ========================================
-// Records Search
-// ========================================
-async function searchRecords() {
+async function searchRecords(isAutoLoad = false) {
     const tarih = elements.filterTarih.value;
     const makine = elements.filterMakine.value;
 
-    if (!tarih && !makine) {
-        showToast('Lütfen en az bir filtre seçin.', 'error');
-        return;
-    }
+    // Auto load değilse ve filtre yoksa uyar - ARTIK KALDIRILDI, HEPSİNİ GETİR
+    // if (!isAutoLoad && !tarih && !makine) { ... }
 
     showLoading();
 
     try {
+        let records = [];
         if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
-            // Demo modu - örnek veriler
             await simulateApiCall();
-            const demoData = generateDemoData(tarih, makine);
-            displayRecords(demoData);
+            records = generateDemoData(tarih, makine);
         } else {
             const response = await fetchRecords(tarih, makine);
-            displayRecords(response.data);
+            records = response.data || [];
         }
+
+        // Client-side sorting: En son girilen en üstte (Array'i ters çevir)
+        // Eğer backend zaten tarih sırasına göre (eski->yeni) veriyorsa, reverse() yeni->eski yapar.
+        currentRecords = records.reverse();
+
+        // Filtreleme sonuçlarını göster
+        currentPage = 1;
+        renderPagination();
+
+        // İstatistik güncelle
+        elements.totalRecords.textContent = currentRecords.length;
+
+        if (currentRecords.length === 0) {
+            elements.emptyState.classList.remove('hidden');
+            elements.recordsTable.classList.add('hidden');
+            elements.recordsStats.classList.add('hidden');
+            document.getElementById('paginationControls').classList.add('hidden');
+        } else {
+            elements.emptyState.classList.add('hidden');
+            elements.recordsTable.classList.remove('hidden');
+            elements.recordsStats.classList.remove('hidden');
+            document.getElementById('paginationControls').classList.remove('hidden');
+        }
+
     } catch (error) {
         console.error('Search error:', error);
         showToast('Kayıtlar yüklenirken bir hata oluştu.', 'error');
     } finally {
         hideLoading();
     }
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    renderPagination();
+}
+
+function renderPagination() {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = currentRecords.slice(start, end);
+
+    displayRecords(pageData);
+
+    // Update UI Controls
+    const totalPages = Math.ceil(currentRecords.length / rowsPerPage) || 1;
+    document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
 }
 
 async function fetchRecords(tarih, makine) {
