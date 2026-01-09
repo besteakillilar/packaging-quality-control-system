@@ -339,17 +339,7 @@
                     </button>
                 </div>
 
-                <div class="filter-options-row"
-                    style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 14px; color: #64748b;">
-                        Sayfada göster:
-                        <select id="rowsPerPage" style="width: auto; padding: 4px 8px; margin-left: 5px;">
-                            <option value="15" selected>15</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                </div>
+
 
                 <div class="records-stats hidden" id="recordsStats">
                     <div class="stat-card">
@@ -400,7 +390,19 @@
                 </div>
 
                 <div id="paginationControls" class="pagination-controls hidden"
-                    style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+                    style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center; flex-wrap: wrap;">
+
+                    <!-- Rows Per Page (Moved here) -->
+                    <div style="font-size: 14px; color: #64748b; margin-right: 15px;">
+                        Sayfada göster:
+                        <select id="rowsPerPage"
+                            style="width: auto; padding: 4px 8px; margin-left: 5px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                            <option value="15" selected>15</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+
                     <button class="btn btn-secondary btn-sm" id="prevPage" disabled>❮ Önceki</button>
                     <span id="pageInfo" style="color: #475569; font-weight: 500;">Sayfa 1</span>
                     <button class="btn btn-secondary btn-sm" id="nextPage" disabled>Sonraki ❯</button>
