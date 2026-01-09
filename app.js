@@ -380,60 +380,8 @@ let currentRecords = [];
 // ========================================
 // Event Listeners (Updated)
 // ========================================
-function setupEventListeners() {
-    // Tab Navigation
-    elements.navTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            switchTab(tab.dataset.tab);
-            // Tab değiştiğinde kayıtlar sekmesi ise otomatik yükle
-            if (tab.dataset.tab === 'records') {
-                // Sadece ilk seferde veya filtreler boşsa otomatik yükle
-                if (currentRecords.length === 0) {
-                    searchRecords(true);
-                }
-            }
-        });
-    });
+// setupEventListeners was here
 
-    // Form Submission
-    elements.qualityForm.addEventListener('submit', handleFormSubmit);
-
-    // Reset Form
-    elements.resetFormBtn.addEventListener('click', resetForm);
-
-    // File Upload
-    elements.fileInput.addEventListener('change', handleFileUpload);
-    elements.removeImageBtn.addEventListener('click', removeImage);
-
-    // Search Records
-    elements.searchBtn.addEventListener('click', () => searchRecords(false));
-
-    // Pagination Controls
-    const prevPageBtn = document.getElementById('prevPage');
-    const nextPageBtn = document.getElementById('nextPage');
-    const rowsPerPageSelect = document.getElementById('rowsPerPage');
-
-    if (prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(-1));
-    if (nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(1));
-    if (rowsPerPageSelect) {
-        rowsPerPageSelect.addEventListener('change', (e) => {
-            rowsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            renderPagination();
-        });
-    }
-
-    // Modal
-    elements.closeModal.addEventListener('click', closeImageModal);
-    elements.imageModal.addEventListener('click', (e) => {
-        if (e.target === elements.imageModal) closeImageModal();
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeImageModal();
-    });
-}
 
 // ========================================
 // Tab Navigation
@@ -1003,3 +951,62 @@ function formatDateTR(date) {
 async function simulateApiCall() {
     return new Promise(resolve => setTimeout(resolve, 1000));
 }
+
+// ========================================
+// Event Listeners (Moved to End)
+// ========================================
+function setupEventListeners() {
+    // Tab Navigation
+    elements.navTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchTab(tab.dataset.tab);
+            // Tab degistiginde kayitlar sekmesi ise otomatik y�kle
+            if (tab.dataset.tab === 'records') {
+                // Sadece ilk seferde veya filtreler bossa otomatik y�kle
+                if (currentRecords.length === 0) {
+                    searchRecords(true);
+                }
+            }
+        });
+    });
+
+    // Form Submission
+    elements.qualityForm.addEventListener('submit', handleFormSubmit);
+
+    // Reset Form
+    elements.resetFormBtn.addEventListener('click', resetForm);
+
+    // File Upload
+    elements.fileInput.addEventListener('change', handleFileUpload);
+    elements.removeImageBtn.addEventListener('click', removeImage);
+
+    // Search Records
+    elements.searchBtn.addEventListener('click', () => searchRecords(false));
+
+    // Pagination Controls
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+
+    if (prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(-1));
+    if (nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(1));
+    if (rowsPerPageSelect) {
+        rowsPerPageSelect.addEventListener('change', (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderPagination();
+        });
+    }
+
+    // Modal
+    elements.closeModal.addEventListener('click', closeImageModal);
+    elements.imageModal.addEventListener('click', (e) => {
+        if (e.target === elements.imageModal) closeImageModal();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeImageModal();
+    });
+}
+
