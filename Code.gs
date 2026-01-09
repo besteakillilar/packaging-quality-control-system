@@ -390,7 +390,7 @@ function saveImageToDrive(base64Data, po, sku) {
  * Send email notification
  */
 function sendEmailNotification(formData, imageFile) {
-  const subject = `${formData.makine} - PO:${formData.po} - SKU: ${formData.sku} Kontrol Raporu`;
+  const subject = `${formData.makine} | PO:${formData.po} | SKU: ${formData.sku} | Kontrol Raporu`;
 
   let htmlBody = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -401,12 +401,12 @@ function sendEmailNotification(formData, imageFile) {
 
       <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;">
         <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Tarih</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.tarih}</td></tr>
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Makine</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.makine}</td></tr>
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> PO</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.po}</td></tr>
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> SKU</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.sku}</td></tr>
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ef4444;">⚠️ Hata</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#ef4444;font-weight:bold;">${formData.hata}</td></tr>
-          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;"> Açıklama</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.hataAciklama || '-'}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Tarih</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.tarih}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Makine</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.makine}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> PO</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.po}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> SKU</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.sku}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ef4444;width:120px;">⚠️ Hata</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#ef4444;font-weight:bold;">${formData.hata}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Açıklama</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.hataAciklama || '-'}</td></tr>
         </table>
 
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
