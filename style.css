@@ -861,12 +861,13 @@ body::before {
 
 .multi-select-value {
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
     color: var(--text-primary);
     flex: 1;
     min-width: 0;
+    line-height: 1.4;
+    padding: 2px 0;
 }
 
 .multi-select-value.placeholder {
