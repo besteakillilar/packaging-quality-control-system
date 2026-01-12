@@ -1327,6 +1327,19 @@ select[multiple].hidden-select {
         margin: 10px;
         max-height: calc(100vh - 20px);
     }
+
+    /* SPECIFIC DATE INPUT FIX */
+    .flatpickr-input,
+    #tarih,
+    .flatpickr-mobile {
+        text-align: left !important;
+        padding-left: 1.25rem !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
 }
 
 /* Extra small devices */
