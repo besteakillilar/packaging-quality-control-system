@@ -315,6 +315,7 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
 }
 
 .form-group label {
@@ -686,11 +687,11 @@ body::before {
 .footer {
     text-align: center;
     padding: 3rem 2rem;
-    color: #1e1b4b;
-    /* Çok koyu, asil bir mor/indigo tonu */
+    color: #4a4e69;
+    /* Muted grey-purple, very subtle */
     font-size: 0.85rem;
     font-weight: 500;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .view-link {
@@ -1188,12 +1189,15 @@ select[multiple].hidden-select {
 
     .form-group input,
     .form-group select,
-    .form-group textarea {
-        padding: 0.75rem 1rem;
-        font-size: 16px;
+    .form-group textarea,
+    .flatpickr-input {
+        padding: 0.75rem 1rem !important;
+        font-size: 16px !important;
         text-align: left !important;
-        width: 100%;
-        display: block;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
     }
 
     .filter-section {
