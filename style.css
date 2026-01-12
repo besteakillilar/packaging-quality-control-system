@@ -1460,3 +1460,23 @@ select[multiple].hidden-select {
         order: 0;
     }
 }
+/* === FLATPICKR DATE INPUT FIX === */
+.flatpickr-wrapper {
+    width: 100%;
+}
+
+.form-group input.flatpickr-input,
+.form-group input.flatpickr-mobile,
+.filter-group input.flatpickr-input {
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 1.25rem !important;   /* dikey padding yok */
+    line-height: 52px !important;    /* metin tam ortalanir */
+    text-align: center;
+}
+
+/* iOS native date görünümü bastir */
+input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
