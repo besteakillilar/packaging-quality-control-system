@@ -333,6 +333,7 @@ body::before {
 .form-group input,
 .form-group select,
 .form-group textarea {
+    width: 100%;
     padding: 1rem 1.25rem;
     background: var(--bg-input);
     border: 1px solid var(--border-color);
@@ -684,9 +685,11 @@ body::before {
 .footer {
     text-align: center;
     padding: 3rem 2rem;
-    color: var(--text-muted);
+    color: #4c1d95;
+    /* Koyu Mor (Subtle Dark Purple) */
     font-size: 0.9rem;
     font-weight: 500;
+    opacity: 0.8;
 }
 
 .view-link {
