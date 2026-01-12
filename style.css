@@ -1187,27 +1187,29 @@ select[multiple].hidden-select {
         gap: 1rem;
     }
 
-    /* SPECIFIC DATE INPUT FIX - AGGRESSIVE */
-    #tarih,
-    .flatpickr-input,
-    .flatpickr-mobile {
-        text-align: left !important;
-        padding: 0.875rem 1rem !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
-        display: block !important;
-        box-sizing: border-box !important;
-        height: 52px !important;
-        font-size: 16px !important;
-        margin: 0 !important;
-    }
-
     /* Prevent any centering in the form container on mobile */
     .quality-form,
     .form-group {
         text-align: left !important;
-        align-items: flex-start !important;
+        align-items: stretch !important;
+    }
+
+    /* SPECIFIC DATE INPUT FIX */
+    #tarih,
+    .flatpickr-input,
+    .flatpickr-mobile,
+    input[type="date"] {
+        text-align: left !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Fix centering in native mobile date picker */
+    input[type="date"]::-webkit-date-and-time-value {
+        text-align: left !important;
+        min-height: 1.5em;
     }
 
     .filter-section {
