@@ -343,7 +343,7 @@ body::before {
     font-family: inherit;
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
-    text-align: left;
+    text-align: left !important;
 }
 
 .form-group textarea {
@@ -686,11 +686,11 @@ body::before {
 .footer {
     text-align: center;
     padding: 3rem 2rem;
-    color: #2e1065;
-    /* Daha koyu ve oturaklı mor */
-    font-size: 0.9rem;
+    color: #1e1b4b;
+    /* Çok koyu, asil bir mor/indigo tonu */
+    font-size: 0.85rem;
     font-weight: 500;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .view-link {
@@ -1191,7 +1191,7 @@ select[multiple].hidden-select {
     .form-group textarea {
         padding: 0.75rem 1rem;
         font-size: 16px;
-        text-align: left;
+        text-align: left !important;
         width: 100%;
         display: block;
     }
