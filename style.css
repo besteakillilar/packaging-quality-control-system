@@ -344,7 +344,7 @@ body::before {
     font-family: inherit;
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
-    text-align: left !important;
+    text-align: center;
 }
 
 .form-group textarea {
@@ -1187,28 +1187,21 @@ select[multiple].hidden-select {
         gap: 1rem;
     }
 
-    /* Prevent any centering in the form container on mobile */
-    .quality-form,
-    .form-group {
-        text-align: left !important;
-        align-items: stretch !important;
-    }
-
     /* SPECIFIC DATE INPUT FIX */
     #tarih,
     .flatpickr-input,
     .flatpickr-mobile,
     input[type="date"] {
-        text-align: left !important;
+        text-align: center !important;
         width: 100% !important;
         max-width: 100% !important;
         display: block !important;
         box-sizing: border-box !important;
     }
 
-    /* Fix centering in native mobile date picker */
+    /* Center in native mobile date picker */
     input[type="date"]::-webkit-date-and-time-value {
-        text-align: left !important;
+        text-align: center !important;
         min-height: 1.5em;
     }
 
