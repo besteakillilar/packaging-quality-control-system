@@ -1173,6 +1173,7 @@ select[multiple].hidden-select {
     .records-container {
         padding: 1.25rem;
         border-radius: var(--radius-lg);
+        overflow-x: hidden;
     }
 
     .form-header h2,
@@ -1187,17 +1188,31 @@ select[multiple].hidden-select {
         gap: 1rem;
     }
 
-    /* DATE INPUT FIX - MOBILE */
+    /* Date input alignment and overflow fix */
+    .form-group,
+    .filter-group {
+        min-width: 0 !important;
+    }
+
+    .form-group input,
+    .filter-group input,
+    #tarih,
+    #filterTarih,
+    .flatpickr-input,
+    .flatpickr-mobile,
+    .flatpickr-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        text-align: center !important;
+    }
+
     #tarih,
     #filterTarih,
     .flatpickr-input {
-        text-align: center !important;
-        width: 100% !important;
-        display: block !important;
-        box-sizing: border-box !important;
         padding: 1rem 1.25rem !important;
         height: 52px !important;
-        /* Standart yükseklik */
         background: var(--bg-input) !important;
         border: 1px solid var(--border-color) !important;
         border-radius: var(--radius-md) !important;
