@@ -1313,7 +1313,7 @@ select[multiple].hidden-select {
 
     /* Stats cards mobile */
     .records-stats {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr !important;
         gap: 0.75rem;
     }
 
@@ -1460,6 +1460,7 @@ select[multiple].hidden-select {
         order: 0;
     }
 }
+
 /* === FLATPICKR DATE INPUT FIX === */
 .flatpickr-wrapper {
     width: 100%;
@@ -1470,12 +1471,14 @@ select[multiple].hidden-select {
 .filter-group input.flatpickr-input {
     height: 52px !important;
     min-height: 52px !important;
-    padding: 0 1.25rem !important;   /* dikey padding yok */
-    line-height: 52px !important;    /* metin tam ortalanir */
+    padding: 0 1.25rem !important;
+    /* dikey padding yok */
+    line-height: 52px !important;
+    /* metin tam ortalanir */
     text-align: center;
 }
 
-/* iOS native date görünümü bastir */
+/* iOS native date gï¿½rï¿½nï¿½mï¿½ bastir */
 input[type="date"] {
     -webkit-appearance: none;
     appearance: none;
