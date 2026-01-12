@@ -138,7 +138,7 @@ function initializeDatePickers() {
         locale: 'tr',
         dateFormat: 'd.m.Y',
         allowInput: true,
-        theme: 'light'
+        theme: 'light', disableMobile: true
     };
 
     flatpickr('#tarih', {

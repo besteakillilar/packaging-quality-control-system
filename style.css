@@ -1187,17 +1187,27 @@ select[multiple].hidden-select {
         gap: 1rem;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea,
-    .flatpickr-input {
-        padding: 0.75rem 1rem !important;
-        font-size: 16px !important;
+    /* SPECIFIC DATE INPUT FIX - AGGRESSIVE */
+    #tarih,
+    .flatpickr-input,
+    .flatpickr-mobile {
         text-align: left !important;
+        padding: 0.875rem 1rem !important;
         width: 100% !important;
+        min-width: 0 !important;
         max-width: 100% !important;
         display: block !important;
         box-sizing: border-box !important;
+        height: 52px !important;
+        font-size: 16px !important;
+        margin: 0 !important;
+    }
+
+    /* Prevent any centering in the form container on mobile */
+    .quality-form,
+    .form-group {
+        text-align: left !important;
+        align-items: flex-start !important;
     }
 
     .filter-section {
@@ -1326,19 +1336,6 @@ select[multiple].hidden-select {
     .modal-content {
         margin: 10px;
         max-height: calc(100vh - 20px);
-    }
-
-    /* SPECIFIC DATE INPUT FIX */
-    .flatpickr-input,
-    #tarih,
-    .flatpickr-mobile {
-        text-align: left !important;
-        padding-left: 1.25rem !important;
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
-        display: block !important;
-        box-sizing: border-box !important;
     }
 }
 
