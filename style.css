@@ -638,6 +638,32 @@ body::before {
     margin-bottom: 0.5rem;
 }
 
+.records-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.records-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.records-table-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.records-table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.records-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
 .records-table {
     width: 100%;
     border-collapse: separate;
@@ -654,6 +680,9 @@ body::before {
     letter-spacing: 0.05em;
     padding: 1.25rem 1rem;
     border-bottom: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .records-table td {
@@ -661,6 +690,14 @@ body::before {
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-light);
     transition: background var(--transition-fast);
+}
+
+.records-table tbody tr {
+    transition: all var(--transition-fast);
+}
+
+.records-table tbody tr:hover {
+    transform: scale(1.001);
 }
 
 .records-table tbody tr:hover td {
@@ -1174,6 +1211,7 @@ select[multiple].hidden-select {
         padding: 1.25rem;
         border-radius: var(--radius-lg);
         overflow-x: hidden;
+        max-width: 100%;
     }
 
     .form-header h2,
@@ -1244,16 +1282,20 @@ select[multiple].hidden-select {
     .records-table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        width: 100%;
+        border-radius: var(--radius-md);
+        box-shadow: inset 0 0 0 1px var(--border-color);
     }
 
     .records-table {
-        min-width: 800px;
+        min-width: 1000px;
         font-size: 0.85rem;
     }
 
     .records-table th,
     .records-table td {
         padding: 0.75rem 0.5rem;
+        white-space: nowrap;
     }
 
     /* Multi-select improvements for mobile */
