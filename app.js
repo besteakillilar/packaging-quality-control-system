@@ -814,17 +814,17 @@ function displayRecords(records) {
     elements.totalRecords.textContent = records.length;
 
     elements.recordsBody.innerHTML = records.map(record => `
-        <tr>
-            <td data-label="Tarih">${record.tarih}</td>
-            <td data-label="Makine">${record.makine}</td>
-            <td data-label="PO">${record.po}</td>
-            <td data-label="SKU">${record.sku}</td>
-            <td data-label="Hata"><span class="error-cell">${record.hata}</span></td>
-            <td data-label="Açıklama">${record.hataAciklama || '-'}</td>
-            <td data-label="Görsel">
+        <tr draggable="false">
+            <td data-label="Tarih" draggable="false">${record.tarih}</td>
+            <td data-label="Makine" draggable="false">${record.makine}</td>
+            <td data-label="PO" draggable="false">${record.po}</td>
+            <td data-label="SKU" draggable="false">${record.sku}</td>
+            <td data-label="Hata" draggable="false"><span class="error-cell" draggable="false">${record.hata}</span></td>
+            <td data-label="Açıklama" draggable="false">${record.hataAciklama || '-'}</td>
+            <td data-label="Görsel" draggable="false">
                 ${record.hataGorsel ?
-            `<a href="#" onclick="openImageModal('${record.hataGorsel}'); return false;" class="view-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            `<a href="#" onclick="openImageModal('${record.hataGorsel}'); return false;" class="view-link" draggable="false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" draggable="false">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
@@ -832,11 +832,11 @@ function displayRecords(records) {
                     </a>`
             : '-'}
             </td>
-            <td data-label="Kefe">${record.kefe || '-'}</td>
-            <td data-label="Sayım">${record.sayim || '-'}</td>
-            <td data-label="Veri Giriş">${record.veriGiris || '-'}</td>
-            <td data-label="Sorumlu">${record.sorumlu || '-'}</td>
-            <td data-label="Kalite">${record.kaliteKontrol || '-'}</td>
+            <td data-label="Kefe" draggable="false">${record.kefe || '-'}</td>
+            <td data-label="Sayım" draggable="false">${record.sayim || '-'}</td>
+            <td data-label="Veri Giriş" draggable="false">${record.veriGiris || '-'}</td>
+            <td data-label="Sorumlu" draggable="false">${record.sorumlu || '-'}</td>
+            <td data-label="Kalite" draggable="false">${record.kaliteKontrol || '-'}</td>
         </tr>
     `).join('');
 }
