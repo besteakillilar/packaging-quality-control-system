@@ -40,6 +40,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* PWA mobil için overscroll engeli */
+    overscroll-behavior: none;
 }
 
 body {
@@ -50,6 +52,10 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    /* PWA mobil için sürükleme engeli */
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior: contain;
 }
 
 body::before {

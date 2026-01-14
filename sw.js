@@ -2,7 +2,7 @@
 // Bu sürüm tüm eski cache'leri siler ve sadece network kullanır.
 // Sorun çözüldükten sonra normal PWA moduna dönülebilir.
 
-const CACHE_NAME = 'kalite-kontrol-reset-v1';
+const CACHE_NAME = 'kalite-kontrol-reset-v3';
 
 // Install - Hemen aktif ol
 self.addEventListener('install', (event) => {
