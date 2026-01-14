@@ -575,6 +575,8 @@ body::before {
     margin-bottom: 2rem;
     padding: 1.5rem;
     background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
     border-radius: var(--radius-lg);
     flex-wrap: wrap;
 }
@@ -633,6 +635,7 @@ body::before {
     padding: 1.25rem;
     background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
     border-radius: var(--radius-lg);
 }
 
