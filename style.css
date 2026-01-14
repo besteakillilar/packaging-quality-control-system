@@ -894,12 +894,6 @@ body::before {
         padding: 0.5rem;
     }
 
-    .form-container,
-    .records-container {
-        padding: 1rem;
-        border-radius: var(--radius-md);
-    }
-
     .form-row,
     .form-row.triple {
         grid-template-columns: 1fr;
@@ -920,7 +914,13 @@ body::before {
         justify-content: center;
     }
 
-    /* Mobil Tablo - Yatay Scroll */
+    .form-container,
+    .records-container {
+        padding: 1rem;
+        border-radius: var(--radius-md);
+    }
+
+    /* Mobil Tablo - Yatay Scroll (İyileştirilmiş) */
     .records-table-wrapper {
         max-height: 400px;
         overflow-x: auto !important;
@@ -931,32 +931,90 @@ body::before {
         -webkit-overflow-scrolling: touch;
         position: relative;
         touch-action: pan-x pan-y;
-        -webkit-user-drag: none;
         user-select: none;
+        -webkit-user-select: none;
+        /* Metin seçimini engelle */
+        -webkit-user-drag: none;
+        /* Element sürüklemeyi engelle */
+        overscroll-behavior-x: contain;
+        /* Yan scrollun sayfayı tetiklemesini engelle */
+        margin-bottom: 1rem;
     }
 
     .records-table {
         min-width: 900px;
         width: max-content;
         table-layout: auto;
+        display: table;
+        border-collapse: separate;
+    }
+
+    .records-table thead {
+        display: table-header-group;
+    }
+
+    .records-table tbody {
+        display: table-row-group;
+    }
+
+    .records-table tr {
+        display: table-row;
+        margin-bottom: 0;
+        box-shadow: none;
+        border: none;
+        background: transparent;
     }
 
     .records-table th {
         white-space: nowrap;
-        padding: 0.5rem 0.5rem;
-        font-size: 0.65rem !important;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.7rem !important;
+        background: #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        text-align: center;
     }
 
-    /* TÜM td ve içerikleri aynı font boyutunda */
+    /* TÜM td ve içerikleri için kesin kurallar */
+    .records-table td {
+        display: table-cell;
+        white-space: nowrap;
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid var(--border-light);
+        text-align: center;
+        vertical-align: middle;
+        /* iOS Text Inflation Fix */
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    .records-table td::before {
+        display: none;
+    }
+
+    /* Hücre içindeki HER ŞEYİ kapsa */
     .records-table td,
     .records-table td *,
     .records-table td span,
     .records-table td a,
+    .records-table td div,
     .records-table .error-cell {
-        white-space: nowrap;
-        padding: 0.4rem 0.4rem;
-        font-size: 0.65rem !important;
-        line-height: 1.2 !important;
+        font-size: 0.75rem !important;
+        line-height: 1.4 !important;
+        font-family: inherit !important;
+        font-weight: 400 !important;
+    }
+
+    /* Sadece view-link için bold yap */
+    .records-table td .view-link {
+        font-weight: 600 !important;
+        margin-left: 0;
+    }
+
+    /* Hata hücresi rengini koru */
+    .records-table td[data-label="Hata"] {
+        color: inherit;
     }
 
     .records-header h2 {
