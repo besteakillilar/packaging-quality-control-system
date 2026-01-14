@@ -42,6 +42,9 @@ html {
     scroll-behavior: smooth;
     /* PWA mobil için overscroll engeli */
     overscroll-behavior: none;
+    /* Overscroll sırasında beyaz boşluk görünmemesi için */
+    background-color: #f8fafc;
+    height: 100%;
 }
 
 body {
@@ -50,13 +53,16 @@ body {
     /* Gradientin görünmesi için transparent yapıldı */
     color: var(--text-primary);
     line-height: 1.6;
-    min-height: 100vh;
+    min-height: 100dvh;
+    /* Dynamic viewport height for mobile browsers */
     position: relative;
     overflow-x: hidden;
     /* PWA mobil için sürükleme engeli */
     -webkit-user-drag: none;
     -webkit-touch-callout: none;
     overscroll-behavior: contain;
+    /* Safe area padding for standalone apps */
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 body::before {
