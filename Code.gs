@@ -19,7 +19,7 @@ const CONFIG = {
   PERSONEL_SHEET_NAME: 'personel',
   MACHINES_SHEET_NAME: 'machines',
   DEFECT_SHEET_NAME: 'defect',
-  EMAIL_RECIPIENTS: 'besteakillilar@gmail.com, besteak.kalisan@gmail.com', // Birden fazla alıcı için virgül ile ayırın: 'mail1@gmail.com, mail2@gmail.com'
+  EMAIL_RECIPIENTS: 'emre@kalisan.com.tr, aleyna@kalisan.com.tr, emel.ekinci@kalisan.com.tr, tugba.ucar@kalisan.com.tr, beste.akillilar@kalisan.com.tr', // Birden fazla alıcı için virgül ile ayırın: 'mail1@gmail.com, mail2@gmail.com'
   TIMEZONE: 'Europe/Istanbul'
 };
 
