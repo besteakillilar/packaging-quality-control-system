@@ -923,14 +923,16 @@ body::before {
     /* Mobil Tablo - Yatay Scroll */
     .records-table-wrapper {
         max-height: 400px;
-        overflow-x: auto;
-        overflow-y: auto;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
         border: 1px solid var(--border-light);
         border-radius: var(--radius-md);
         background: var(--bg-input);
         -webkit-overflow-scrolling: touch;
         position: relative;
         touch-action: pan-x pan-y;
+        -webkit-user-drag: none;
+        user-select: none;
     }
 
     .records-table {
@@ -942,19 +944,19 @@ body::before {
     .records-table th {
         white-space: nowrap;
         padding: 0.5rem 0.5rem;
-        font-size: 0.7rem !important;
-    }
-
-    .records-table td {
-        white-space: nowrap;
-        padding: 0.5rem 0.5rem;
-        font-size: 0.7rem !important;
-    }
-
-    /* Hata ve Açıklama sütunları için sabit boyut */
-    .records-table .error-cell {
         font-size: 0.65rem !important;
-        padding: 0.2rem 0.4rem;
+    }
+
+    /* TÜM td ve içerikleri aynı font boyutunda */
+    .records-table td,
+    .records-table td *,
+    .records-table td span,
+    .records-table td a,
+    .records-table .error-cell {
+        white-space: nowrap;
+        padding: 0.4rem 0.4rem;
+        font-size: 0.65rem !important;
+        line-height: 1.2 !important;
     }
 
     .records-header h2 {
@@ -968,6 +970,7 @@ body::before {
     .stat-card {
         padding: 1rem;
         touch-action: none;
+        -webkit-user-drag: none;
     }
 
     .stat-value {
@@ -979,6 +982,8 @@ body::before {
         position: relative;
         touch-action: pan-y;
         overflow: hidden;
+        -webkit-user-drag: none;
+        overscroll-behavior: contain;
     }
 }
 
