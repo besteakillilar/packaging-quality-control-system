@@ -4,7 +4,7 @@
     "description": "Paketleme kalite kontrol takip ve raporlama sistemi",
     "start_url": "/packaging-quality-control-system/",
     "display": "standalone",
-    "background_color": "#f8fafc",
+    "background_color": "#eef2ff",
     "theme_color": "#6366f1",
     "orientation": "any",
     "scope": "/packaging-quality-control-system/",
