@@ -46,7 +46,8 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg-primary);
+    background: transparent;
+    /* Gradientin görünmesi için transparent yapıldı */
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
