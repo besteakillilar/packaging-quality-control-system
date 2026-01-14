@@ -7,7 +7,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3WZvLDE3mxHUIodABK
 // ========================================
 // ðŸ“‹ DÄ°NAMÄ°K LÄ°STELER - Google Sheets'ten YÃ¼klenir
 // ========================================
-// Bu listeler sayfa yÃ¼klendiÄŸinde Google Sheets'ten Ã§ekilir
+// Bu listeler sayfa yüklendiÄŸinde Google Sheets'ten Ã§ekilir
 let PERSONEL_LISTESI = [];
 let MAKINE_LISTESI = [];
 let HATA_LISTESI = [];
@@ -68,7 +68,7 @@ async function loadListsFromSheets() {
             MAKINE_LISTESI = response.data.machines || [];
             HATA_LISTESI = response.data.defects || [];
 
-            console.log('âœ… Listeler yÃ¼klendi:', {
+            console.log('âœ… Listeler yüklendi:', {
                 personel: PERSONEL_LISTESI.length,
                 makine: MAKINE_LISTESI.length,
                 hata: HATA_LISTESI.length
@@ -77,12 +77,12 @@ async function loadListsFromSheets() {
             // Dropdown'larÄ± doldur
             populateDropdowns();
         } else {
-            console.warn('âš ï¸ Listeler yÃ¼klenemedi');
-            showToast('Listeler yÃ¼klenemedi. LÃ¼tfen sayfayÄ± yenileyin.', 'error');
+            console.warn('âš ï¸ Listeler yüklenemedi');
+            showToast('Listeler yüklenemedi. Lütfen sayfayÄ± yenileyin.', 'error');
         }
     } catch (error) {
         console.error('âŒ Liste yÃ¼kleme hatasÄ±:', error);
-        showToast('BaÄŸlantÄ± hatasÄ±. Listeler yÃ¼klenemedi.', 'error');
+        showToast('BaÄŸlantÄ± hatasÄ±. Listeler yüklenemedi.', 'error');
     } finally {
         hideLoading();
     }
@@ -185,7 +185,7 @@ function populateDropdowns() {
     machineDropdowns.forEach(id => {
         const select = document.getElementById(id);
         if (select) {
-            // Keep default option (SeÃ§iniz... or TÃ¼mÃ¼)
+            // Keep default option (Seçiniz... or TÃ¼mÃ¼)
             const defaultOption = select.querySelector('option[value=""]');
             select.innerHTML = '';
             if (defaultOption) select.appendChild(defaultOption);
@@ -226,14 +226,14 @@ function setupMultiSelectDropdowns() {
     const multiSelects = document.querySelectorAll('select[multiple]');
 
     multiSelects.forEach(select => {
-        // EÄŸer zaten oluÅŸturulmuÅŸsa tekrar oluÅŸturma (re-render durumlarÄ± iÃ§in)
+        // EÄŸer zaten oluşturulmuÅŸsa tekrar oluşturma (re-render durumlarÄ± iÃ§in)
         if (select.nextElementSibling && select.nextElementSibling.classList.contains('multi-select-wrapper')) {
             select.nextElementSibling.remove();
         }
 
         select.classList.add('hidden-select');
 
-        // Wrapper oluÅŸtur
+        // Wrapper oluştur
         const wrapper = document.createElement('div');
         wrapper.className = 'multi-select-wrapper';
 
@@ -245,7 +245,7 @@ function setupMultiSelectDropdowns() {
         // SeÃ§ilen deÄŸerleri gÃ¶steren alan
         const valueSpan = document.createElement('span');
         valueSpan.className = 'multi-select-value placeholder';
-        valueSpan.textContent = 'SeÃ§iniz...';
+        valueSpan.textContent = 'Seçiniz...';
         trigger.appendChild(valueSpan);
 
         // SeÃ§enekler Listesi
@@ -327,7 +327,7 @@ function setupMultiSelectDropdowns() {
         function updateTriggerText() {
             const selectedOptions = Array.from(select.selectedOptions);
             if (selectedOptions.length === 0) {
-                valueSpan.textContent = 'SeÃ§iniz...';
+                valueSpan.textContent = 'Seçiniz...';
                 valueSpan.classList.add('placeholder');
             } else {
                 valueSpan.textContent = selectedOptions.map(o => o.textContent).join(', ');
@@ -417,26 +417,26 @@ async function handleFormSubmit(e) {
         console.log('PO:', formData.po);
         console.log('SKU:', formData.sku);
         console.log('Hata:', formData.hata);
-        console.log('Hata AÃ§Ä±klama:', formData.hataAciklama);
+        console.log('Hata Açıklama:', formData.hataAciklama);
         console.log('Kefe:', formData.kefe);
-        console.log('SayÄ±m:', formData.sayim);
-        console.log('Veri GiriÅŸ:', formData.veriGiris);
+        console.log('Sayım:', formData.sayim);
+        console.log('Veri Giriş:', formData.veriGiris);
         console.log('Sorumlu:', formData.sorumlu);
         console.log('Kalite Kontrol:', formData.kaliteKontrol);
-        console.log('GÃ¶rsel var mÄ±:', formData.hataGorsel ? 'Evet' : 'HayÄ±r');
+        console.log('Görsel var mı:', formData.hataGorsel ? 'Evet' : 'Hayır');
         console.log('Full JSON:', JSON.stringify(formData));
         console.log('=================');
 
-        // SimÃ¼le edilmiÅŸ API Ã§aÄŸrÄ±sÄ± (Google Apps Script entegrasyonu)
+        // Simüle edilmiş API çağrısı (Google Apps Script entegrasyonu)
         if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
-            // Demo modu - gerÃ§ek API baÄŸlantÄ±sÄ± yok
+            // Demo modu - gerçek API bağlantısı yok
             await simulateApiCall();
-            showToast('KayÄ±t baÅŸarÄ±yla eklendi ve e-posta gÃ¶nderildi!', 'success');
+            showToast('Kayıt başarıyla eklendi ve e-posta gönderildi!', 'success');
             resetForm();
         } else {
             const response = await submitToGoogleSheets(formData);
             if (response.success) {
-                showToast('KayÄ±t baÅŸarÄ±yla eklendi ve e-posta gÃ¶nderildi!', 'success');
+                showToast('Kayıt başarıyla eklendi ve e-posta gönderildi!', 'success');
                 resetForm();
             } else {
                 showToast('Hata: ' + response.message, 'error');
@@ -444,15 +444,15 @@ async function handleFormSubmit(e) {
         }
     } catch (error) {
         console.error('Form submission error:', error);
-        showToast('Bir hata oluÅŸtu. LÃ¼tfen tekrar deneyin.', 'error');
+        showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
         hideLoading();
     }
 }
 
 function validateForm() {
-    // Hata Ã§Ä±kmadÄ±ÄŸÄ± durumlar iÃ§in hata alanÄ±nÄ± ve personel alanlarÄ±nÄ± zorunlu tutmuyoruz
-    // Sadece kaydÄ±n temel kimliÄŸi olan alanlar zorunlu kalsÄ±n
+    // Hata çıkmadığı durumlar için hata alanını ve personel alanlarını zorunlu tutmuyoruz
+    // Sadece kaydın temel kimliği olan alanlar zorunlu kalsın
     const required = ['tarih', 'makine', 'po', 'sku'];
     let isValid = true;
 
@@ -467,7 +467,7 @@ function validateForm() {
     });
 
     if (!isValid) {
-        showToast('LÃ¼tfen tÃ¼m zorunlu alanlarÄ± doldurun.', 'error');
+        showToast('Lütfen tÃ¼m zorunlu alanları doldurun.', 'error');
     }
 
     return isValid;
@@ -533,7 +533,7 @@ async function submitToGoogleSheets(formData) {
         // Action type
         addHiddenInput('action', 'submit');
 
-        // Form alanlarÄ± - ayrÄ± ayrÄ± gÃ¶nder (gÃ¶rsel en sonda olmalÄ± Ã§Ã¼nkÃ¼ Ã§ok bÃ¼yÃ¼k olabilir)
+        // Form alanları - ayrÄ± ayrÄ± gÃ¶nder (görsel en sonda olmalÄ± Ã§Ã¼nkÃ¼ Ã§ok bÃ¼yÃ¼k olabilir)
         addHiddenInput('tarih', formData.tarih);
         addHiddenInput('makine', formData.makine);
         addHiddenInput('po', formData.po);
@@ -545,7 +545,7 @@ async function submitToGoogleSheets(formData) {
         addHiddenInput('veriGiris', formData.veriGiris);
         addHiddenInput('sorumlu', formData.sorumlu);
         addHiddenInput('kaliteKontrol', formData.kaliteKontrol);
-        // GÃ¶rsel en sonda - bÃ¼yÃ¼k veri olduÄŸu iÃ§in diÄŸer alanlarÄ± etkilememeli
+        // GÃ¶rsel en sonda - bÃ¼yÃ¼k veri olduÄŸu iÃ§in diÄŸer alanları etkilememeli
         addHiddenInput('hataGorsel', formData.hataGorsel || '');
 
         // Hidden iframe for response
@@ -558,7 +558,7 @@ async function submitToGoogleSheets(formData) {
             document.body.appendChild(iframe);
         }
 
-        // Form'u gÃ¼venli bir ÅŸekilde kaldÄ±r
+        // Form'u gÃ¼venli bir ÅŸekilde kaldır
         const removeForm = () => {
             if (!formRemoved && form.parentNode) {
                 form.parentNode.removeChild(form);
@@ -569,7 +569,7 @@ async function submitToGoogleSheets(formData) {
         // Timeout for completion
         const timeout = setTimeout(() => {
             removeForm();
-            resolve({ success: true, message: 'KayÄ±t gÃ¶nderildi' });
+            resolve({ success: true, message: 'KayÄ±t gönderildi' });
         }, 5000); // 5 saniye timeout
 
         iframe.onload = () => {
@@ -595,7 +595,7 @@ function resetForm() {
 
     // Reset custom multi-selects
     document.querySelectorAll('.multi-select-wrapper').forEach(wrapper => {
-        // SeÃ§imleri kaldÄ±r
+        // SeÃ§imleri kaldır
         wrapper.querySelectorAll('.option-item.selected').forEach(item => {
             item.classList.remove('selected');
         });
@@ -603,7 +603,7 @@ function resetForm() {
         // Trigger metnini sÄ±fÄ±rla
         const valueSpan = wrapper.querySelector('.multi-select-value');
         if (valueSpan) {
-            valueSpan.textContent = 'SeÃ§iniz...';
+            valueSpan.textContent = 'Seçiniz...';
             valueSpan.classList.add('placeholder');
         }
 
@@ -626,12 +626,12 @@ function handleFileUpload(e) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-        showToast('LÃ¼tfen bir gÃ¶rsel dosyasÄ± seÃ§in.', 'error');
+        showToast('Lütfen bir görsel dosyasÄ± seçin.', 'error');
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-        showToast('Dosya boyutu 5MB\'dan kÃ¼Ã§Ã¼k olmalÄ±dÄ±r.', 'error');
+        showToast('Dosya boyutu 5MB\'dan küçük olmalıdır.', 'error');
         return;
     }
 
@@ -697,7 +697,7 @@ async function searchRecords(isAutoLoad = false) {
 
     } catch (error) {
         console.error('Search error:', error);
-        showToast('KayÄ±tlar yÃ¼klenirken bir hata oluÅŸtu.', 'error');
+        showToast('KayÄ±tlar yÃ¼klenirken bir hata oluştu.', 'error');
     } finally {
         hideLoading();
     }
@@ -853,7 +853,7 @@ function generateDemoData(tarih, makine) {
             po: `PO-${Math.floor(Math.random() * 10000)}`,
             sku: `SKU-${Math.floor(Math.random() * 1000)}`,
             hata: hataTurleri[Math.floor(Math.random() * hataTurleri.length)],
-            hataAciklama: 'Ã–rnek hata aÃ§Ä±klamasÄ±',
+            hataAciklama: 'Örnek hata açıklaması',
             kefe: PERSONEL_LISTESI[Math.floor(Math.random() * PERSONEL_LISTESI.length)],
             sayim: PERSONEL_LISTESI[Math.floor(Math.random() * PERSONEL_LISTESI.length)],
             veriGiris: PERSONEL_LISTESI[Math.floor(Math.random() * PERSONEL_LISTESI.length)],
@@ -886,7 +886,7 @@ function openImageModal(imageSrc) {
         }
 
         if (fileId) {
-            // sz=s4000 parametresi ile yÃ¼ksek Ã§Ã¶zÃ¼nÃ¼rlÃ¼klÃ¼ gÃ¶rsel al
+            // sz=s4000 parametresi ile yÃ¼ksek Ã§Ã¶zÃ¼nÃ¼rlÃ¼klÃ¼ görsel al
             displayUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=s4000`;
         }
     }
@@ -898,7 +898,7 @@ function openImageModal(imageSrc) {
         // Sonsuz dÃ¶ngÃ¼yÃ¼ Ã¶nlemek iÃ§in error handler'Ä± temizle
         modalImg.onerror = null;
 
-        if (confirm("GÃ¶rsel Ã¶nizlemesi yÃ¼klenemedi. Resmi yeni sekmede aÃ§mak ister misiniz?")) {
+        if (confirm("GÃ¶rsel Ã¶nizlemesi yüklenemedi. Resmi yeni sekmede aÃ§mak ister misiniz?")) {
             window.open(imageSrc, '_blank');
             closeImageModal();
         } else {
