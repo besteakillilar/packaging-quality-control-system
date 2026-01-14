@@ -139,7 +139,7 @@ function initializeDatePickers() {
         dateFormat: 'd.m.Y',
         allowInput: true,
         theme: 'light',
-        disableMobile: true 
+        disableMobile: true
     };
 
     flatpickr('#tarih', {
@@ -1008,6 +1008,13 @@ function setupEventListeners() {
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeImageModal();
+    });
+
+    // Prevent dragstart on table to stop ghost dragging
+    document.addEventListener('dragstart', (e) => {
+        if (e.target.closest('.records-table')) {
+            e.preventDefault();
+        }
     });
 }
 

@@ -922,9 +922,10 @@ body::before {
 
     /* Mobil Tablo - Yatay Scroll (İyileştirilmiş) */
     .records-table-wrapper {
-        max-height: 400px;
+        max-height: none;
+        /* Sayfa içi scroll olsun, kutu içi değil */
         overflow-x: auto !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
         border: 1px solid var(--border-light);
         border-radius: var(--radius-md);
         background: var(--bg-input);
@@ -933,12 +934,19 @@ body::before {
         touch-action: pan-x pan-y;
         user-select: none;
         -webkit-user-select: none;
-        /* Metin seçimini engelle */
         -webkit-user-drag: none;
         /* Element sürüklemeyi engelle */
         overscroll-behavior-x: contain;
         /* Yan scrollun sayfayı tetiklemesini engelle */
         margin-bottom: 1rem;
+    }
+
+    /* Tablo içindeki elemanların sürüklenmesini engelle */
+    .records-table,
+    .records-table tr,
+    .records-table td,
+    .records-table th {
+        -webkit-user-drag: none;
     }
 
     .records-table {
