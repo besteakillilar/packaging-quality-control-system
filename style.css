@@ -880,6 +880,170 @@ body::before {
     border-color: var(--primary) !important;
 }
 
+/* Confirm Submit Modal - Modern Premium Design */
+.confirm-modal-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.98));
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    border-radius: var(--radius-xl);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(99, 102, 241, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    animation: modalPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradient border effect */
+.confirm-modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary), var(--primary-dark));
+    border-radius: var(--radius-xl);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+@keyframes modalPopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-30px);
+    }
+
+    50% {
+        transform: scale(1.02) translateY(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.confirm-modal-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow:
+        0 15px 35px -5px rgba(99, 102, 241, 0.4),
+        0 5px 15px -3px rgba(139, 92, 246, 0.3);
+    animation: iconPulse 2s ease-in-out infinite;
+    position: relative;
+}
+
+.confirm-modal-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+    z-index: -1;
+    animation: iconRing 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes iconRing {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+}
+
+.confirm-modal-content h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e293b, #6366f1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+}
+
+.confirm-modal-content p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.85;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.confirm-modal-actions .btn {
+    min-width: 130px;
+    padding: 0.9rem 1.5rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.confirm-modal-actions .btn-secondary {
+    background: rgba(241, 245, 249, 0.9);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.confirm-modal-actions .btn-secondary:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.confirm-modal-actions .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
+}
+
+.confirm-modal-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.5);
+    filter: brightness(1.05);
+}
+
 .hidden {
     display: none !important;
 }

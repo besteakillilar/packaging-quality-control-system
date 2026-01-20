@@ -405,12 +405,29 @@ async function handleFormSubmit(e) {
 
     if (!validateForm()) return;
 
+    // Show confirmation modal instead of submitting directly
+    showConfirmModal();
+}
+
+// Confirmation Modal Functions
+function showConfirmModal() {
+    const modal = document.getElementById('confirmSubmitModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function hideConfirmModal() {
+    const modal = document.getElementById('confirmSubmitModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function confirmAndSubmit() {
+    hideConfirmModal();
     showLoading();
 
     try {
         const formData = collectFormData();
 
-        // DEBUG: Form verilerini konsola yazdÄ±r
+        // DEBUG: Form verilerini konsola yazdır
         console.log('=== FORM DATA ===');
         console.log('Tarih:', formData.tarih);
         console.log('Makine:', formData.makine);
@@ -1005,9 +1022,25 @@ function setupEventListeners() {
         if (e.target === elements.imageModal) closeImageModal();
     });
 
+    // Confirm Submit Modal
+    const confirmCancelBtn = document.getElementById('confirmCancel');
+    const confirmSubmitBtn = document.getElementById('confirmSubmit');
+    const confirmModal = document.getElementById('confirmSubmitModal');
+
+    if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmModal);
+    if (confirmSubmitBtn) confirmSubmitBtn.addEventListener('click', confirmAndSubmit);
+    if (confirmModal) {
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) hideConfirmModal();
+        });
+    }
+
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeImageModal();
+        if (e.key === 'Escape') {
+            closeImageModal();
+            hideConfirmModal();
+        }
     });
 
     // Prevent dragstart on table to stop ghost dragging

@@ -429,6 +429,24 @@
         </div>
     </div>
 
+    <!-- Confirm Submit Modal -->
+    <div class="modal hidden" id="confirmSubmitModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13" />
+                    <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+            </div>
+            <h3>Kaydı Göndermek İstiyor musunuz?</h3>
+            <p>Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</p>
+            <div class="confirm-modal-actions">
+                <button type="button" class="btn btn-secondary" id="confirmCancel">İptal</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmit">Evet, Gönder</button>
+            </div>
+        </div>
+    </div>
+
     <!-- PWA Install Prompt -->
     <div id="pwaInstallPrompt" class="pwa-install-prompt hidden">
         <div class="pwa-install-content">
