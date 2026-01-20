@@ -364,6 +364,7 @@ body::before {
     resize: vertical;
     min-height: 100px;
     line-height: 1.5;
+    padding-top: 2.3rem;
 }
 
 .form-group input::placeholder,
