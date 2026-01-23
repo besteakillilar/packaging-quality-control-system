@@ -235,8 +235,8 @@
                         <span>Personel Bilgileri</span>
                     </div>
 
-                    <!-- Standard Personnel Fields -->
-                    <div class="form-row triple" id="standardPersonnelRow">
+                    <!-- Kefe & Sayım (Hidden when Heating error is selected) -->
+                    <div class="form-row double" id="kefeSayimRow">
                         <div class="form-group">
                             <label for="kefe">Kefe</label>
                             <select id="kefe" name="kefe" multiple>
@@ -249,19 +249,23 @@
                                 <option value="">Seçiniz...</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Isıtma Special Field (Hidden by default, shown only for Heating error) -->
+                    <div class="form-row single hidden" id="heatingPersonnelRow">
                         <div class="form-group">
-                            <label for="veriGiris">Veri Giriş</label>
-                            <select id="veriGiris" name="veriGiris" multiple>
+                            <label for="isitmaPersonel">Isıtma</label>
+                            <select id="isitmaPersonel" name="isitmaPersonel" multiple>
                                 <option value="">Seçiniz...</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Isıtma Special Field (Hidden by default) -->
-                    <div class="form-row single hidden" id="heatingPersonnelRow">
+                    <!-- Veri Giriş (Always Visible) -->
+                    <div class="form-row single">
                         <div class="form-group">
-                            <label for="isitmaPersonel">Isıtma</label>
-                            <select id="isitmaPersonel" name="isitmaPersonel" multiple>
+                            <label for="veriGiris">Veri Giriş</label>
+                            <select id="veriGiris" name="veriGiris" multiple>
                                 <option value="">Seçiniz...</option>
                             </select>
                         </div>

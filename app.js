@@ -170,15 +170,15 @@ function populateDropdowns() {
 
 
     // 1. Visibility Toggling
-    const standardRow = document.getElementById('standardPersonnelRow');
+    const kefeSayimRow = document.getElementById('kefeSayimRow');
     const heatingRow = document.getElementById('heatingPersonnelRow');
 
-    if (standardRow && heatingRow) {
+    if (kefeSayimRow && heatingRow) {
         if (isHeatingError) {
-            standardRow.classList.add('hidden');
+            kefeSayimRow.classList.add('hidden');
             heatingRow.classList.remove('hidden');
         } else {
-            standardRow.classList.remove('hidden');
+            kefeSayimRow.classList.remove('hidden');
             heatingRow.classList.add('hidden');
         }
     }
