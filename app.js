@@ -163,15 +163,24 @@ function populateDropdowns() {
     // Check currently selected error
     const errorSelect = document.getElementById('hata');
     const selectedError = errorSelect ? errorSelect.value : '';
-    const isHeatingError = selectedError && selectedError.toLowerCase().includes('ısıtma');
+
+    // Türkçe karakter desteği için toLocaleLowerCase kullanıyoruz
+    const isHeatingError = selectedError && (
+        selectedError.toLocaleLowerCase('tr').includes('ısıtma') ||
+        selectedError.toLowerCase().includes('isitma')
+    );
+
+    console.log('Hata Seçimi:', selectedError, 'Isıtma Modu:', isHeatingError);
 
     // 1. Personel Dropdowns
     const personnelDropdowns = ['kefe', 'sayim', 'veriGiris', 'sorumlu', 'kaliteKontrol'];
 
     // Prepare personnel list - add 'Isıtma' if applicable
     let currentPersonnelList = [...PERSONEL_LISTESI];
-    if (isHeatingError && !currentPersonnelList.includes('Isıtma')) {
-        currentPersonnelList.unshift('Isıtma');
+    if (isHeatingError) {
+        if (!currentPersonnelList.includes('Isıtma')) {
+            currentPersonnelList.unshift('Isıtma');
+        }
     }
 
     personnelDropdowns.forEach(id => {
