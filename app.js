@@ -164,13 +164,11 @@ function populateDropdowns() {
     const errorSelect = document.getElementById('hata');
     const selectedError = errorSelect ? errorSelect.value : '';
 
-    // Türkçe karakter desteği için toLocaleLowerCase kullanıyoruz
-    const isHeatingError = selectedError && (
-        selectedError.toLocaleLowerCase('tr').includes('ısıtma') ||
-        selectedError.toLowerCase().includes('isitma')
-    );
+    // Türkçe karakter desteği için sağlam kontrol
+    const normalizedError = selectedError ? selectedError.toLocaleLowerCase('tr').trim() : '';
+    const isHeatingError = normalizedError.includes('ısıtma') || normalizedError.includes('isitma');
 
-    console.log('Hata Seçimi:', selectedError, 'Isıtma Modu:', isHeatingError);
+
 
     // 1. Personel Dropdowns
     const personnelDropdowns = ['kefe', 'sayim', 'veriGiris', 'sorumlu', 'kaliteKontrol'];
@@ -187,7 +185,7 @@ function populateDropdowns() {
         const select = document.getElementById(id);
         if (select) {
             // Save selected values to restore them if possible
-            const selectedValues = Array.from(select.selectedOptions).map(opt => opt.value);
+            let selectedValues = Array.from(select.selectedOptions).map(opt => opt.value);
 
             // Keep default option if not multiple
             const defaultOption = select.querySelector('option[value=""]');
@@ -199,13 +197,22 @@ function populateDropdowns() {
                 const option = document.createElement('option');
                 option.value = person;
                 option.textContent = person;
+
+                // Mevcut seçimleri koru
                 if (selectedValues.includes(person)) {
                     option.selected = true;
                 }
+
+                // Eğer Isıtma moduysa ve bu seçenek "Isıtma" ise, ve hiç seçim yapılmamışsa OTOMATİK SEÇ
+                if (isHeatingError && person === 'Isıtma' && selectedValues.length === 0) {
+                    option.selected = true;
+                }
+
                 select.appendChild(option);
             });
         }
     });
+
 
     // 2. Makine Dropdowns
     const machineDropdowns = ['makine', 'filterMakine'];
