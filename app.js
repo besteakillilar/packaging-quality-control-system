@@ -175,11 +175,12 @@ function populateDropdowns() {
 
     if (kefeSayimRow && heatingRow) {
         if (isHeatingError) {
-            kefeSayimRow.classList.add('hidden');
-            heatingRow.classList.remove('hidden');
+            // kefeSayimRow.classList.add('hidden'); // ARTIK GİZLEMİYORUZ
+            kefeSayimRow.classList.remove('hidden'); // Her zaman görünsün
+            heatingRow.classList.remove('hidden');   // Isıtma açılsın
         } else {
             kefeSayimRow.classList.remove('hidden');
-            heatingRow.classList.add('hidden');
+            heatingRow.classList.add('hidden');      // Isıtma gizlensin
         }
     }
 
