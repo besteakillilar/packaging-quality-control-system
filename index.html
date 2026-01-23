@@ -235,7 +235,8 @@
                         <span>Personel Bilgileri</span>
                     </div>
 
-                    <div class="form-row triple">
+                    <!-- Standard Personnel Fields -->
+                    <div class="form-row triple" id="standardPersonnelRow">
                         <div class="form-group">
                             <label for="kefe">Kefe</label>
                             <select id="kefe" name="kefe" multiple>
@@ -251,6 +252,16 @@
                         <div class="form-group">
                             <label for="veriGiris">Veri Giriş</label>
                             <select id="veriGiris" name="veriGiris" multiple>
+                                <option value="">Seçiniz...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Isıtma Special Field (Hidden by default) -->
+                    <div class="form-row single hidden" id="heatingPersonnelRow">
+                        <div class="form-group">
+                            <label for="isitmaPersonel">Isıtma</label>
+                            <select id="isitmaPersonel" name="isitmaPersonel" multiple>
                                 <option value="">Seçiniz...</option>
                             </select>
                         </div>

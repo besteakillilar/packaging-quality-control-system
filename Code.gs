@@ -132,7 +132,8 @@ function doPost(e) {
           sayim: e.parameter.sayim || '',
           veriGiris: e.parameter.veriGiris || '',
           sorumlu: e.parameter.sorumlu || '',
-          kaliteKontrol: e.parameter.kaliteKontrol || ''
+          kaliteKontrol: e.parameter.kaliteKontrol || '',
+          isitma: e.parameter.isitma || '' // Yeni alan
         };
         Logger.log('Form data from separate fields');
       }
@@ -409,19 +410,19 @@ function sendEmailNotification(formData, imageFile) {
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Açıklama</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.hataAciklama || '-'}</td></tr>
         </table>
 
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-          <h3 style="color: #1e40af; margin: 0 0 15px;">Personel Bilgileri</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kefe:</td><td style="padding:8px 0;color:#1e293b;">${formData.kefe}</td></tr>
-            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sayım:</td><td style="padding:8px 0;color:#1e293b;">${formData.sayim}</td></tr>
-            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Veri Giriş:</td><td style="padding:8px 0;color:#1e293b;">${formData.veriGiris}</td></tr>
-            
-            ${(formData.hata && formData.hata.toString().toLowerCase().includes('ısıtma')) ? 
-            `<tr><td style="padding:8px 0;color:#475569;font-weight:500;">Isıtma:</td><td style="padding:8px 0;color:#1e293b;">Isıtma İşlemi</td></tr>` : ''
+            ${(formData.hata && (formData.hata.toString().toLowerCase().includes('ısıtma') || formData.hata.toString().toLowerCase().includes('isitma'))) ? 
+              // Isıtma hatası seçildiyse: Isıtma (yeni alan), Sorumlu, Kalite Kontrol
+              `<tr><td style="padding:8px 0;color:#475569;font-weight:500;">Isıtma:</td><td style="padding:8px 0;color:#1e293b;">${formData.isitma}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sorumlu:</td><td style="padding:8px 0;color:#1e293b;">${formData.sorumlu}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kalite Kontrol:</td><td style="padding:8px 0;color:#1e293b;">${formData.kaliteKontrol}</td></tr>` 
+              : 
+              // Diğer hatalar: Kefe, Sayım, Veri Giriş, Sorumlu, Kalite Kontrol
+              `<tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kefe:</td><td style="padding:8px 0;color:#1e293b;">${formData.kefe}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sayım:</td><td style="padding:8px 0;color:#1e293b;">${formData.sayim}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Veri Giriş:</td><td style="padding:8px 0;color:#1e293b;">${formData.veriGiris}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sorumlu:</td><td style="padding:8px 0;color:#1e293b;">${formData.sorumlu}</td></tr>
+               <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kalite Kontrol:</td><td style="padding:8px 0;color:#1e293b;">${formData.kaliteKontrol}</td></tr>`
             }
-            
-            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sorumlu:</td><td style="padding:8px 0;color:#1e293b;">${formData.sorumlu}</td></tr>
-            <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kalite Kontrol:</td><td style="padding:8px 0;color:#1e293b;">${formData.kaliteKontrol}</td></tr>
           </table>
         </div>
       </div>

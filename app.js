@@ -169,17 +169,23 @@ function populateDropdowns() {
     const isHeatingError = normalizedError.includes('ısıtma') || normalizedError.includes('isitma');
 
 
+    // 1. Visibility Toggling
+    const standardRow = document.getElementById('standardPersonnelRow');
+    const heatingRow = document.getElementById('heatingPersonnelRow');
 
-    // 1. Personel Dropdowns
-    const personnelDropdowns = ['kefe', 'sayim', 'veriGiris', 'sorumlu', 'kaliteKontrol'];
-
-    // Prepare personnel list - add 'Isıtma' if applicable
-    let currentPersonnelList = [...PERSONEL_LISTESI];
-    if (isHeatingError) {
-        if (!currentPersonnelList.includes('Isıtma')) {
-            currentPersonnelList.unshift('Isıtma');
+    if (standardRow && heatingRow) {
+        if (isHeatingError) {
+            standardRow.classList.add('hidden');
+            heatingRow.classList.remove('hidden');
+        } else {
+            standardRow.classList.remove('hidden');
+            heatingRow.classList.add('hidden');
         }
     }
+
+    // 2. Personel Dropdowns (Standard + Special)
+    // 'isitmaPersonel' de artık bu listeye dahil edilmeli
+    const personnelDropdowns = ['kefe', 'sayim', 'veriGiris', 'sorumlu', 'kaliteKontrol', 'isitmaPersonel'];
 
     personnelDropdowns.forEach(id => {
         const select = document.getElementById(id);
@@ -193,7 +199,7 @@ function populateDropdowns() {
             // Çoklu seçimde 'Seçiniz' opsiyonuna gerek yok, hatta validasyon sorunu yaratabilir
             if (defaultOption && !select.multiple) select.appendChild(defaultOption);
 
-            currentPersonnelList.forEach(person => {
+            PERSONEL_LISTESI.forEach(person => {
                 const option = document.createElement('option');
                 option.value = person;
                 option.textContent = person;
@@ -202,12 +208,6 @@ function populateDropdowns() {
                 if (selectedValues.includes(person)) {
                     option.selected = true;
                 }
-
-                // Eğer Isıtma moduysa ve bu seçenek "Isıtma" ise, ve hiç seçim yapılmamışsa OTOMATİK SEÇ
-                if (isHeatingError && person === 'Isıtma' && selectedValues.length === 0) {
-                    option.selected = true;
-                }
-
                 select.appendChild(option);
             });
         }
@@ -238,9 +238,6 @@ function populateDropdowns() {
     });
 
     // 3. Hata Dropdowns (Only populate if empty or initial load, to avoid loop)
-    // But here we just refresh options. If we rebuild 'hata' while 'hata' triggered this, we might lose focus.
-    // However, HATA_LISTESI usually doesn't change based on Hata. 
-    // We should be careful not to reset 'hata' selection if it's already selected.
     if (errorSelect && errorSelect.options.length <= 1) {
         const defaultOption = errorSelect.querySelector('option[value=""]');
         errorSelect.innerHTML = '';
@@ -571,7 +568,8 @@ function collectFormData() {
         sayim: getSelectedValues('sayim'),
         veriGiris: getSelectedValues('veriGiris'),
         sorumlu: getSelectedValues('sorumlu'),
-        kaliteKontrol: getSelectedValues('kaliteKontrol')
+        kaliteKontrol: getSelectedValues('kaliteKontrol'),
+        isitma: getSelectedValues('isitmaPersonel') // Yeni alan: Isıtma Personeli
     };
 }
 
@@ -610,6 +608,7 @@ async function submitToGoogleSheets(formData) {
         addHiddenInput('veriGiris', formData.veriGiris);
         addHiddenInput('sorumlu', formData.sorumlu);
         addHiddenInput('kaliteKontrol', formData.kaliteKontrol);
+        addHiddenInput('isitma', formData.isitma); // Yeni alan
         // GÃ¶rsel en sonda - bÃ¼yÃ¼k veri olduÄŸu iÃ§in diÄŸer alanları etkilememeli
         addHiddenInput('hataGorsel', formData.hataGorsel || '');
 
