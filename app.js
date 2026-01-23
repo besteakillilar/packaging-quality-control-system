@@ -340,6 +340,11 @@ function setupMultiSelectDropdowns() {
             optionItem.appendChild(checkbox);
             optionItem.appendChild(label);
 
+            // Başlangıç durumu kontrolü (Otomatik seçimler için kritik)
+            if (opt.selected) {
+                optionItem.classList.add('selected');
+            }
+
             // TÄ±klama OlayÄ±
             optionItem.addEventListener('click', (e) => {
                 e.stopPropagation(); // Dropdown'Ä±n kapanmasÄ±nÄ± engelle
@@ -374,6 +379,9 @@ function setupMultiSelectDropdowns() {
                 valueSpan.classList.remove('placeholder');
             }
         }
+
+        // Başlangıç metnini güncelle (Auto-select'i yansıtmak için önemli)
+        updateTriggerText();
 
         // Dropdown AÃ§ma/Kapama
         trigger.addEventListener('click', (e) => {
