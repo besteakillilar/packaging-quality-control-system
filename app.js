@@ -160,21 +160,39 @@ function setDefaultDate() {
 // Dropdowns Population
 // ========================================
 function populateDropdowns() {
+    // Check currently selected error
+    const errorSelect = document.getElementById('hata');
+    const selectedError = errorSelect ? errorSelect.value : '';
+    const isHeatingError = selectedError && selectedError.toLowerCase().includes('ısıtma');
+
     // 1. Personel Dropdowns
     const personnelDropdowns = ['kefe', 'sayim', 'veriGiris', 'sorumlu', 'kaliteKontrol'];
+
+    // Prepare personnel list - add 'Isıtma' if applicable
+    let currentPersonnelList = [...PERSONEL_LISTESI];
+    if (isHeatingError && !currentPersonnelList.includes('Isıtma')) {
+        currentPersonnelList.unshift('Isıtma');
+    }
+
     personnelDropdowns.forEach(id => {
         const select = document.getElementById(id);
         if (select) {
+            // Save selected values to restore them if possible
+            const selectedValues = Array.from(select.selectedOptions).map(opt => opt.value);
+
             // Keep default option if not multiple
             const defaultOption = select.querySelector('option[value=""]');
             select.innerHTML = '';
-            // Ã‡oklu seÃ§imde 'SeÃ§iniz' opsiyonuna gerek yok, hatta validasyon sorunu yaratabilir
+            // Çoklu seçimde 'Seçiniz' opsiyonuna gerek yok, hatta validasyon sorunu yaratabilir
             if (defaultOption && !select.multiple) select.appendChild(defaultOption);
 
-            PERSONEL_LISTESI.forEach(person => {
+            currentPersonnelList.forEach(person => {
                 const option = document.createElement('option');
                 option.value = person;
                 option.textContent = person;
+                if (selectedValues.includes(person)) {
+                    option.selected = true;
+                }
                 select.appendChild(option);
             });
         }
@@ -185,7 +203,10 @@ function populateDropdowns() {
     machineDropdowns.forEach(id => {
         const select = document.getElementById(id);
         if (select) {
-            // Keep default option (Seçiniz... or TÃ¼mÃ¼)
+            // Check if this is a rebuild (don't lose selection)
+            const selectedVal = select.value;
+
+            // Keep default option (Seçiniz... or Tümü)
             const defaultOption = select.querySelector('option[value=""]');
             select.innerHTML = '';
             if (defaultOption) select.appendChild(defaultOption);
@@ -194,15 +215,17 @@ function populateDropdowns() {
                 const option = document.createElement('option');
                 option.value = machine;
                 option.textContent = machine;
+                if (machine === selectedVal) option.selected = true;
                 select.appendChild(option);
             });
         }
     });
 
-    // 3. Hata Dropdowns
-    const errorSelect = document.getElementById('hata');
-    if (errorSelect) {
-        // Keep default option
+    // 3. Hata Dropdowns (Only populate if empty or initial load, to avoid loop)
+    // But here we just refresh options. If we rebuild 'hata' while 'hata' triggered this, we might lose focus.
+    // However, HATA_LISTESI usually doesn't change based on Hata. 
+    // We should be careful not to reset 'hata' selection if it's already selected.
+    if (errorSelect && errorSelect.options.length <= 1) {
         const defaultOption = errorSelect.querySelector('option[value=""]');
         errorSelect.innerHTML = '';
         if (defaultOption) errorSelect.appendChild(defaultOption);
@@ -211,6 +234,7 @@ function populateDropdowns() {
             const option = document.createElement('option');
             option.value = error;
             option.textContent = error;
+            if (error === selectedError) option.selected = true;
             errorSelect.appendChild(option);
         });
     }
@@ -1000,6 +1024,14 @@ function setupEventListeners() {
 
     // Search Records
     elements.searchBtn.addEventListener('click', () => searchRecords(false));
+
+    // Hata değiştiğinde personel listesini güncelle (Isıtma kontrolü)
+    const errorSelect = document.getElementById('hata');
+    if (errorSelect) {
+        errorSelect.addEventListener('change', () => {
+            populateDropdowns();
+        });
+    }
 
     // Pagination Controls
     const prevPageBtn = document.getElementById('prevPage');

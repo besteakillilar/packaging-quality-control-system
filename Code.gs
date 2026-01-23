@@ -415,6 +415,11 @@ function sendEmailNotification(formData, imageFile) {
             <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kefe:</td><td style="padding:8px 0;color:#1e293b;">${formData.kefe}</td></tr>
             <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sayım:</td><td style="padding:8px 0;color:#1e293b;">${formData.sayim}</td></tr>
             <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Veri Giriş:</td><td style="padding:8px 0;color:#1e293b;">${formData.veriGiris}</td></tr>
+            
+            ${(formData.hata && formData.hata.toString().toLowerCase().includes('ısıtma')) ? 
+            `<tr><td style="padding:8px 0;color:#475569;font-weight:500;">Isıtma:</td><td style="padding:8px 0;color:#1e293b;">Isıtma İşlemi</td></tr>` : ''
+            }
+            
             <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Sorumlu:</td><td style="padding:8px 0;color:#1e293b;">${formData.sorumlu}</td></tr>
             <tr><td style="padding:8px 0;color:#475569;font-weight:500;">Kalite Kontrol:</td><td style="padding:8px 0;color:#1e293b;">${formData.kaliteKontrol}</td></tr>
           </table>
