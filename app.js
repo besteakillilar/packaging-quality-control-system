@@ -31,6 +31,7 @@ const elements = {
     filterTarih: document.getElementById('filterTarih'),
     filterMakine: document.getElementById('filterMakine'),
     searchBtn: document.getElementById('searchBtn'),
+    clearFiltersBtn: document.getElementById('clearFiltersBtn'),
     recordsStats: document.getElementById('recordsStats'),
     totalRecords: document.getElementById('totalRecords'),
     emptyState: document.getElementById('emptyState'),
@@ -769,8 +770,14 @@ async function searchRecords(isAutoLoad = false) {
 }
 
 function changePage(direction) {
-    currentPage += direction;
-    renderPagination();
+    const totalPages = Math.ceil(currentRecords.length / rowsPerPage) || 1;
+    const newPage = currentPage + direction;
+
+    // Bounds check to prevent errors
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderPagination();
+    }
 }
 
 function renderPagination() {
@@ -1048,6 +1055,26 @@ function setupEventListeners() {
 
     // Search Records
     elements.searchBtn.addEventListener('click', () => searchRecords(false));
+
+    // Clear Filters
+    if (elements.clearFiltersBtn) {
+        elements.clearFiltersBtn.addEventListener('click', () => {
+            // Reset Date (Flatpickr)
+            if (elements.filterTarih._flatpickr) {
+                elements.filterTarih._flatpickr.clear();
+            } else {
+                elements.filterTarih.value = '';
+            }
+
+            // Reset Machine
+            if (elements.filterMakine) {
+                elements.filterMakine.value = '';
+            }
+
+            // Trigger Search to show all records
+            searchRecords(false);
+        });
+    }
 
     // Hata değiştiğinde personel listesini güncelle (Isıtma kontrolü)
     const errorSelect = document.getElementById('hata');

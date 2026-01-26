@@ -1929,3 +1929,17 @@ input[type="date"] {
     -webkit-appearance: none;
     appearance: none;
 }
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.pagination-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
