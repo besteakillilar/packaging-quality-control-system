@@ -90,45 +90,27 @@ async function loadListsFromSheets() {
 }
 
 async function fetchListsFromAPI() {
-    return new Promise((resolve, reject) => {
-        const callbackName = 'handleListsResponse_' + Date.now();
+    try {
+        // Modern Fetch API kullan - JSONP yerine POST
+        const formData = new FormData();
+        formData.append('action', 'getLists');
 
-        window[callbackName] = function (data) {
-            delete window[callbackName];
-            if (document.body.contains(script)) {
-                document.body.removeChild(script);
-            }
-            resolve(data);
-        };
-
-        const params = new URLSearchParams({
-            action: 'getLists',
-            callback: callbackName
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
         });
 
-        const script = document.createElement('script');
-        script.src = `${SCRIPT_URL}?${params}`;
-        script.onerror = () => {
-            delete window[callbackName];
-            if (document.body.contains(script)) {
-                document.body.removeChild(script);
-            }
-            reject(new Error('Script yÃ¼kleme hatasÄ±'));
-        };
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        document.body.appendChild(script);
-
-        // Timeout - 10 saniye
-        setTimeout(() => {
-            if (window[callbackName]) {
-                delete window[callbackName];
-                if (document.body.contains(script)) {
-                    document.body.removeChild(script);
-                }
-                reject(new Error('Zaman aÅŸÄ±mÄ±'));
-            }
-        }, 10000);
-    });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+    }
 }
 
 // ========================================

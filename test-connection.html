@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Bağlantı Testi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .result.warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .result pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #1976D2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔍 Google Sheets Bağlantı Testi</h1>
+        <p>Google Apps Script URL'nizin çalışıp çalışmadığını test edin</p>
+
+        <div class="info-box">
+            <strong>💡 İpucu:</strong> URL'niz <code>https://script.google.com/macros/s/...</code> ile başlamalı ve
+            <code>/exec</code> ile bitmelidir.
+        </div>
+
+        <input type="text" class="url-input" id="scriptUrl" placeholder="Google Apps Script URL'nizi buraya yapıştırın"
+            value="https://script.google.com/macros/s/AKfycbz3WZvLDE3mxHUIodABKcx7AJtI5cHHiFJwrUE7hESmed3YIzZujALJ_BhSTw9yuMXi/exec">
+
+        <button class="btn" onclick="testConnection()">Bağlantıyı Test Et</button>
+
+        <div class="spinner" id="spinner"></div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        async function testConnection() {
+            const url = document.getElementById('scriptUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            const spinner = document.getElementById('spinner');
+            const btn = document.querySelector('.btn');
+
+            // Reset
+            resultDiv.className = 'result';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            // Validation
+            if (!url) {
+                showResult('error', 'Hata', 'Lütfen bir URL girin!');
+                return;
+            }
+
+            if (!url.startsWith('https://script.google.com/macros/s/')) {
+                showResult('warning', 'Uyarı', 'URL geçersiz görünüyor. Google Apps Script URL\'si olmalı.');
+                return;
+            }
+
+            // Start test
+            btn.disabled = true;
+            spinner.style.display = 'block';
+
+            try {
+                // Test 1: getLists endpoint
+                console.log('Testing getLists endpoint...');
+                const listsResult = await testEndpoint(url, 'getLists');
+
+                if (listsResult.success) {
+                    let message = '<h3>✅ Bağlantı Başarılı!</h3>';
+                    message += '<p>Google Sheets ile bağlantı kuruldu.</p>';
+
+                    if (listsResult.data) {
+                        message += '<p><strong>Yüklenen Veriler:</strong></p>';
+                        message += `<ul>`;
+                        message += `<li>Personel: ${listsResult.data.personnel?.length || 0} kişi</li>`;
+                        message += `<li>Makine: ${listsResult.data.machines?.length || 0} adet</li>`;
+                        message += `<li>Hata Türü: ${listsResult.data.defects?.length || 0} adet</li>`;
+                        message += `</ul>`;
+                    }
+
+                    message += '<pre>' + JSON.stringify(listsResult, null, 2) + '</pre>';
+                    showResult('success', '', message);
+                } else {
+                    showResult('error', '❌ Bağlantı Başarısız',
+                        `<p>${listsResult.message || 'Bilinmeyen hata'}</p>
+                        <p><strong>Olası Çözümler:</strong></p>
+                        <ul>
+                            <li>Google Apps Script'i yeniden deploy edin</li>
+                            <li>"Who has access" ayarını "Anyone" yapın</li>
+                            <li>Sayfa isimlerini kontrol edin (database, personel, machines, defect)</li>
+                        </ul>
+                        <pre>${JSON.stringify(listsResult, null, 2)}</pre>`
+                    );
+                }
+            } catch (error) {
+                showResult('error', '❌ Bağlantı Hatası',
+                    `<p>${error.message}</p>
+                    <p><strong>Olası Nedenler:</strong></p>
+                    <ul>
+                        <li>URL yanlış veya güncel değil</li>
+                        <li>Google Apps Script deploy edilmemiş</li>
+                        <li>İnternet bağlantısı sorunu</li>
+                        <li>CORS hatası (deployment ayarlarını kontrol edin)</li>
+                    </ul>`
+                );
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        function testEndpoint(baseUrl, action) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'testCallback_' + Date.now();
+
+                window[callbackName] = function (data) {
+                    cleanup();
+                    resolve(data);
+                };
+
+                const params = new URLSearchParams({
+                    action: action,
+                    callback: callbackName
+                });
+
+                const script = document.createElement('script');
+                script.src = `${baseUrl}?${params}`;
+
+                function cleanup() {
+                    if (window[callbackName]) {
+                        delete window[callbackName];
+                    }
+                    if (document.body.contains(script)) {
+                        document.body.removeChild(script);
+                    }
+                }
+
+                script.onerror = () => {
+                    cleanup();
+                    reject(new Error('Script yüklenemedi. URL geçersiz olabilir.'));
+                };
+
+                document.body.appendChild(script);
+
+                // Timeout
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        cleanup();
+                        reject(new Error('Zaman aşımı (10 saniye). Sunucu yanıt vermiyor.'));
+                    }
+                }, 10000);
+            });
+        }
+
+        function showResult(type, title, message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = (title ? `<h3>${title}</h3>` : '') + message;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

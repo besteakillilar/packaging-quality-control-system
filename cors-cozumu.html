@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Hatası Çözümü</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .error-box h3 {
+            color: #991b1b;
+            margin-bottom: 10px;
+        }
+
+        .error-box code {
+            background: #fca5a5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .solution {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .solution h2 {
+            color: #15803d;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            margin-bottom: 20px;
+            padding-left: 50px;
+            position: relative;
+            line-height: 1.8;
+            color: #374151;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #16a34a;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .steps li strong {
+            color: #16a34a;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border: 2px solid #f59e0b;
+        }
+
+        .highlight strong {
+            color: #b45309;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .screenshot {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px dashed #9ca3af;
+        }
+
+        .screenshot h4 {
+            color: #4b5563;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .screenshot ul {
+            margin-left: 20px;
+            color: #6b7280;
+        }
+
+        .screenshot ul li {
+            margin-bottom: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #9a3412;
+        }
+
+        .success {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #15803d;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .important {
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc2626;
+            text-align: center;
+            padding: 20px;
+            background: #fee2e2;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            🚨 CORS Hatası Çözümü
+        </h1>
+        <p class="subtitle">Script sadece sizde çalışıyor, diğer kullanıcılarda çalışmıyor</p>
+
+        <div class="error-box">
+            <h3>❌ Aldığınız Hata:</h3>
+            <p><code>Script yükleme hatası</code></p>
+            <p style="margin-top: 10px;">Bu hata, Google Apps Script'in <strong>erişim izinlerinin yanlış</strong>
+                olduğunu gösterir.</p>
+        </div>
+
+        <div class="solution">
+            <h2>✅ Kesin Çözüm (2 Dakika)</h2>
+
+            <ol class="steps">
+                <li>
+                    <strong>Google Apps Script'i Açın</strong>
+                    <div>
+                        • Google Sheets > Uzantılar > Apps Script<br>
+                        • Veya doğrudan: <code>https://script.google.com/home</code>
+                    </div>
+                </li>
+
+                <li>
+                    <strong>Deploy > Manage Deployments</strong>
+                    <div>Sağ üstteki "Deploy" butonuna tıklayın, sonra "Manage deployments" seçin</div>
+                </li>
+
+                <li>
+                    <strong>Mevcut Deployment'ı Düzenleyin</strong>
+                    <div>
+                        Deployment'ın yanındaki <strong>✏️ (kalem)</strong> ikonuna tıklayın
+                    </div>
+                </li>
+
+                <li>
+                    <strong>"Who has access" Ayarını Değiştirin</strong>
+                    <div class="highlight">
+                        <strong>⚠️ ÇOK ÖNEMLİ!</strong>
+                        "Who has access" dropdown'ını açın ve <strong>"Anyone"</strong> seçin.
+                        <br><br>
+                        <strong>YANLIŞ:</strong> "Only myself" ❌<br>
+                        <strong>DOĞRU:</strong> "Anyone" ✅
+                    </div>
+                </li>
+
+                <li>
+                    <strong>"Deploy" Butonuna Tıklayın</strong>
+                    <div>Değişiklikleri kaydetmek için "Deploy" butonuna tıklayın</div>
+                </li>
+
+                <li>
+                    <strong>Test Edin</strong>
+                    <div>
+                        • Tarayıcı cache'ini temizleyin (CTRL+SHIFT+DELETE)<br>
+                        • Uygulamayı yenileyin (CTRL+F5)<br>
+                        • Başka bir kullanıcıyla test edin
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <div class="important">
+            🎯 "Who has access" = "Anyone" olmalı!
+        </div>
+
+        <div class="screenshot">
+            <h4>📸 Doğru Ayarlar:</h4>
+            <ul>
+                <li><strong>Execute as:</strong> Me (beste.akillilar@kalisan.com.tr)</li>
+                <li><strong>Who has access:</strong> Anyone ← BU ÇOK ÖNEMLİ!</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ "Anyone" Güvenli mi?</strong>
+            <p style="margin-top: 10px;">
+                Evet! "Anyone" demek, URL'yi bilen herkesin kullanabileceği anlamına gelir.
+                URL'niz zaten public bir web uygulaması için kullanılıyor, bu yüzden sorun yok.
+                Hassas veriler için ek güvenlik katmanları ekleyebilirsiniz (API key, authentication vb.)
+            </p>
+        </div>
+
+        <div class="success">
+            <strong>✅ Başarı Kontrolü:</strong>
+            <p style="margin-top: 10px;">
+                Deployment'ı güncelledikten sonra:
+            </p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Farklı bir tarayıcıda test edin</li>
+                <li>Incognito/Private modda test edin</li>
+                <li>Başka bir kullanıcıyla test edin</li>
+            </ul>
+        </div>
+
+        <a href="https://script.google.com/home" target="_blank" class="btn">
+            🚀 Apps Script'i Şimdi Aç
+        </a>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f9fafb; border-radius: 8px;">
+            <h3 style="color: #374151; margin-bottom: 15px;">🔍 Alternatif Çözüm: Yeni Deployment</h3>
+            <p style="color: #6b7280; margin-bottom: 10px;">
+                Eğer mevcut deployment'ı düzenlemek işe yaramazsa:
+            </p>
+            <ol style="margin-left: 20px; color: #6b7280;">
+                <li>Mevcut deployment'ı silin (Archive)</li>
+                <li>Deploy > New deployment yapın</li>
+                <li>"Who has access" = "Anyone" seçin</li>
+                <li>Yeni URL'yi <code>app.js</code> dosyasına yapıştırın</li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+</html>
