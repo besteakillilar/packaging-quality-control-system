@@ -2,7 +2,7 @@
 // Configuration - Google Apps Script Web App URL
 // ========================================
 // Bu URL'yi Google Apps Script'i deploy ettikten sonra gÃ¼ncelleyin
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3WZvLDE3mxHUIodABKcx7AJtI5cHHiFJwrUE7hESmed3YIzZujALJ_BhSTw9yuMXi/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzldY-t9InQh2SOJZ9CAlAWcL_vDG0au5xi5MRLCBuNd7OrO8hRhhpKLyB0Qr223RZAdA/exec';
 
 // ========================================
 // ðŸ“‹ DÄ°NAMÄ°K LÄ°STELER - Google Sheets'ten YÃ¼klenir
