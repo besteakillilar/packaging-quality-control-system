@@ -580,6 +580,20 @@ body::before {
     box-shadow: var(--shadow-sm);
     border-radius: var(--radius-lg);
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
 }
 
 .filter-group {
@@ -681,7 +695,6 @@ body::before {
 
 .records-table-wrapper {
     width: 100%;
-    max-height: 600px;
     overflow-x: auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -1913,8 +1926,7 @@ select[multiple].hidden-select {
 }
 
 .form-group input.flatpickr-input,
-.form-group input.flatpickr-mobile,
-.filter-group input.flatpickr-input {
+.form-group input.flatpickr-mobile {
     height: 52px !important;
     min-height: 52px !important;
     padding: 0 1.25rem !important;
@@ -1922,6 +1934,14 @@ select[multiple].hidden-select {
     line-height: 52px !important;
     /* metin tam ortalanir */
     text-align: center;
+}
+
+.filter-group input.flatpickr-input {
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 1.25rem !important;
+    line-height: 52px !important;
+    text-align: left;
 }
 
 /* iOS native date g�r�n�m� bastir */
@@ -1935,11 +1955,13 @@ input[type="date"] {
     display: none !important;
 }
 
+/* Pagination */
 .pagination-controls {
-    margin-top: 20px;
     display: flex;
     justify-content: center;
-    gap: 10px;
     align-items: center;
-    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
 }

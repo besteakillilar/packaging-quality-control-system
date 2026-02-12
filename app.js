@@ -399,9 +399,9 @@ function setupMultiSelectDropdowns() {
 // ========================================
 // Event Listeners
 // ========================================
-// Pagination State
+// Records & Pagination State
 let currentPage = 1;
-let rowsPerPage = 15;
+const rowsPerPage = 15;
 let currentRecords = [];
 
 // ========================================
@@ -714,38 +714,32 @@ async function searchRecords(isAutoLoad = false) {
             await simulateApiCall();
             records = generateDemoData(tarih, makine);
         } else {
-            // Fetch records from backend
             const response = await fetchRecords(tarih, makine);
             records = response.data || [];
         }
 
-        // Client-side sorting: En son girilen en Ã¼stte (Array'i ters Ã§evir)
         currentRecords = records.reverse();
-
-        // Filtreleme sonuÃ§larÄ±nÄ± gÃ¶ster
         currentPage = 1;
-        renderPagination();
+        renderPage();
 
-        // Ä°statistik gÃ¼ncelle
         elements.totalRecords.textContent = currentRecords.length;
 
+        const paginationControls = document.getElementById('paginationControls');
         if (currentRecords.length === 0) {
             elements.emptyState.classList.remove('hidden');
             elements.recordsTable.classList.add('hidden');
             elements.recordsStats.classList.add('hidden');
-            const paginationControls = document.getElementById('paginationControls');
             if (paginationControls) paginationControls.classList.add('hidden');
         } else {
             elements.emptyState.classList.add('hidden');
             elements.recordsTable.classList.remove('hidden');
             elements.recordsStats.classList.remove('hidden');
-            const paginationControls = document.getElementById('paginationControls');
             if (paginationControls) paginationControls.classList.remove('hidden');
         }
 
     } catch (error) {
         console.error('Search error:', error);
-        showToast('KayÄ±tlar yÃ¼klenirken bir hata oluştu.', 'error');
+        showToast('Kayıtlar yüklenirken bir hata oluştu.', 'error');
     } finally {
         hideLoading();
     }
@@ -754,30 +748,38 @@ async function searchRecords(isAutoLoad = false) {
 function changePage(direction) {
     const totalPages = Math.ceil(currentRecords.length / rowsPerPage) || 1;
     const newPage = currentPage + direction;
-
-    // Bounds check to prevent errors
     if (newPage >= 1 && newPage <= totalPages) {
         currentPage = newPage;
-        renderPagination();
+        renderPage();
     }
 }
 
-function renderPagination() {
+function renderPage() {
+    const totalItems = currentRecords.length;
+    const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
     const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
+    const end = Math.min(start + rowsPerPage, totalItems);
     const pageData = currentRecords.slice(start, end);
 
     displayRecords(pageData);
 
-    // Update UI Controls
-    const totalPages = Math.ceil(currentRecords.length / rowsPerPage) || 1;
+    // Toplam kayıt sayısını doğru tut
+    if (elements.totalRecords) {
+        elements.totalRecords.textContent = totalItems;
+    }
+
+    // Sayfalama kontrolleri
     const pageInfo = document.getElementById('pageInfo');
     const prevPage = document.getElementById('prevPage');
     const nextPage = document.getElementById('nextPage');
 
     if (pageInfo) pageInfo.textContent = `Sayfa ${currentPage} / ${totalPages}`;
-    if (prevPage) prevPage.disabled = currentPage === 1;
-    if (nextPage) nextPage.disabled = currentPage === totalPages;
+    if (prevPage) prevPage.disabled = currentPage <= 1;
+    if (nextPage) nextPage.disabled = currentPage >= totalPages;
 }
 
 async function fetchRecords(tarih, makine) {
@@ -855,17 +857,12 @@ async function fetchRecordsViaIframe(tarih, makine) {
 }
 
 function displayRecords(records) {
+    // Sadece tablo satırlarını render et - visibility ve toplam kayıt yönetimi searchRecords'da
+    elements.recordsBody.innerHTML = '';
+
     if (!records || records.length === 0) {
-        elements.emptyState.classList.remove('hidden');
-        elements.recordsTable.classList.add('hidden');
-        elements.recordsStats.classList.add('hidden');
         return;
     }
-
-    elements.emptyState.classList.add('hidden');
-    elements.recordsTable.classList.remove('hidden');
-    elements.recordsStats.classList.remove('hidden');
-    elements.totalRecords.textContent = records.length;
 
     elements.recordsBody.innerHTML = records.map(record => `
         <tr draggable="false">
@@ -1069,17 +1066,8 @@ function setupEventListeners() {
     // Pagination Controls
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
-    const rowsPerPageSelect = document.getElementById('rowsPerPage');
-
     if (prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(-1));
     if (nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(1));
-    if (rowsPerPageSelect) {
-        rowsPerPageSelect.addEventListener('change', (e) => {
-            rowsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            renderPagination();
-        });
-    }
 
     // Modal
     elements.closeModal.addEventListener('click', closeImageModal);
