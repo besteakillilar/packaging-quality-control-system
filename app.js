@@ -1,4 +1,4 @@
-﻿// ========================================
+// ========================================
 // Configuration - Google Apps Script Web App URL
 // ========================================
 // Bu URL'yi Google Apps Script'i deploy ettikten sonra gÃ¼ncelleyin
