@@ -462,6 +462,7 @@ async function confirmAndSubmit() {
         console.log('Makine:', formData.makine);
         console.log('PO:', formData.po);
         console.log('SKU:', formData.sku);
+        console.log('Lot:', formData.lot);
         console.log('Hata:', formData.hata);
         console.log('Hata Açıklama:', formData.hataAciklama);
         console.log('Kefe:', formData.kefe);
@@ -499,7 +500,7 @@ async function confirmAndSubmit() {
 function validateForm() {
     // Hata çıkmadığı durumlar için hata alanını ve personel alanlarını zorunlu tutmuyoruz
     // Sadece kaydın temel kimliği olan alanlar zorunlu kalsın
-    const required = ['tarih', 'makine', 'po', 'sku'];
+    const required = ['tarih', 'makine', 'po', 'sku', 'lot'];
     let isValid = true;
 
     required.forEach(fieldId => {
@@ -545,6 +546,7 @@ function collectFormData() {
         makine: document.getElementById('makine').value,
         po: document.getElementById('po').value,
         sku: document.getElementById('sku').value,
+        lot: document.getElementById('lot').value,
         hata: document.getElementById('hata').value,
         hataAciklama: document.getElementById('hataAciklama').value,
         hataGorsel: imageData,
@@ -585,6 +587,7 @@ async function submitToGoogleSheets(formData) {
         addHiddenInput('makine', formData.makine);
         addHiddenInput('po', formData.po);
         addHiddenInput('sku', formData.sku);
+        addHiddenInput('lot', formData.lot);
         addHiddenInput('hata', formData.hata);
         addHiddenInput('hataAciklama', formData.hataAciklama);
         addHiddenInput('kefe', formData.kefe);
@@ -870,6 +873,7 @@ function displayRecords(records) {
             <td data-label="Makine" draggable="false">${record.makine}</td>
             <td data-label="PO" draggable="false">${record.po}</td>
             <td data-label="SKU" draggable="false">${record.sku}</td>
+            <td data-label="Lot" draggable="false">${record.lot || '-'}</td>
             <td data-label="Hata" draggable="false"><span class="error-cell" draggable="false">${record.hata}</span></td>
             <td data-label="Açıklama" draggable="false">${record.hataAciklama || '-'}</td>
             <td data-label="Görsel" draggable="false">
@@ -903,6 +907,7 @@ function generateDemoData(tarih, makine) {
             makine: makine || `Makine ${Math.floor(Math.random() * 5) + 1}`,
             po: `PO-${Math.floor(Math.random() * 10000)}`,
             sku: `SKU-${Math.floor(Math.random() * 1000)}`,
+            lot: `LOT-${Math.floor(Math.random() * 100)}`,
             hata: hataTurleri[Math.floor(Math.random() * hataTurleri.length)],
             hataAciklama: 'Örnek hata açıklaması',
             kefe: PERSONEL_LISTESI[Math.floor(Math.random() * PERSONEL_LISTESI.length)],

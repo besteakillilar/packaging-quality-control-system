@@ -29,6 +29,7 @@ const HEADERS = [
   'Makine', 
   'PO',
   'SKU',
+  'Lot',
   'Hata',
   'Hata Açıklama',
   'Hata Görsel',
@@ -49,6 +50,11 @@ const HEADERS = [
  */
 function doGet(e) {
   try {
+    // Apps Script editöründen doğrudan çalıştırıldığında hata vermesini önlemek için e kontrolü eklendi
+    if (!e || !e.parameter) {
+      return createJsonResponse({ success: false, message: 'Bu fonksiyon doğrudan editörden çalıştırılamaz. Lütfen Web Uygulaması URL si üzerinden istek gönderin.' });
+    }
+    
     const action = e.parameter.action;
     const callback = e.parameter.callback; // JSONP callback
     
@@ -92,7 +98,7 @@ function doGet(e) {
     return createJsonResponse(responseData);
   } catch (error) {
     const errorResponse = { success: false, message: error.toString() };
-    const callback = e.parameter.callback;
+    const callback = (e && e.parameter) ? e.parameter.callback : null;
     if (callback) {
       return ContentService
         .createTextOutput(callback + '(' + JSON.stringify(errorResponse) + ')')
@@ -125,6 +131,7 @@ function doPost(e) {
           makine: e.parameter.makine || '',
           po: e.parameter.po || '',
           sku: e.parameter.sku || '',
+          lot: e.parameter.lot || '',
           hata: e.parameter.hata || '',
           hataAciklama: e.parameter.hataAciklama || '',
           hataGorsel: e.parameter.hataGorsel || '',
@@ -160,6 +167,9 @@ function doPost(e) {
       const result = submitFormData(formData);
       Logger.log('Result: ' + JSON.stringify(result));
       return createJsonResponse(result);
+    } else if (action === 'getLists' || action === 'search' || action === 'getPersonnel' || action === 'getMachines' || action === 'getDefects') {
+      // app.js'in "fetch" kullanması durumunda POST ile gönderilen listeleme veya arama isteklerini doğrudan doGet e yönlendirir
+      return doGet(e);
     }
     
     Logger.log('No valid action or formData found');
@@ -206,6 +216,7 @@ function submitFormData(formData) {
       formData.makine || '',
       formData.po || '',
       formData.sku || '',
+      formData.lot || '',
       formData.hata || '',
       formData.hataAciklama || '',
       imageUrl, // Base64 yerine Drive linki
@@ -267,14 +278,15 @@ function searchRecords(tarih, makine) {
         makine: rowMachine,
         po: row[2],
         sku: row[3],
-        hata: row[4],
-        hataAciklama: row[5],
-        hataGorsel: row[6],
-        kefe: row[7],
-        sayim: row[8],
-        veriGiris: row[9],
-        sorumlu: row[10],
-        kaliteKontrol: row[11]
+        lot: row[4],
+        hata: row[5],
+        hataAciklama: row[6],
+        hataGorsel: row[7],
+        kefe: row[8],
+        sayim: row[9],
+        veriGiris: row[10],
+        sorumlu: row[11],
+        kaliteKontrol: row[12]
       });
     }
   });
@@ -406,6 +418,7 @@ function sendEmailNotification(formData, imageFile) {
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Makine</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.makine}</td></tr>
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> PO</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.po}</td></tr>
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> SKU</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.sku}</td></tr>
+          <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Lot Numarası</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.lot || '-'}</td></tr>
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#ef4444;width:120px;">⚠️ Hata</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#ef4444;font-weight:bold;">${formData.hata}</td></tr>
           <tr><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#475569;width:120px;"> Açıklama</td><td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1e293b;">${formData.hataAciklama || '-'}</td></tr>
         </table>
@@ -467,6 +480,7 @@ function sendEmailNotification(formData, imageFile) {
     `Makine: ${formData.makine}\n` +
     `PO: ${formData.po}\n` +
     `SKU: ${formData.sku}\n` +
+    `Lot Numarası: ${formData.lot || '-'}\n` +
     `Hata: ${formData.hata}`;
 
   // Kaba Kuvvet Yöntemi: Herkese TEK TEK ayrı mail at
@@ -677,6 +691,7 @@ function testSubmitData() {
     makine: 'Makine 1',
     po: 'TEST-PO-001',
     sku: 'TEST-SKU-001',
+    lot: 'TEST-LOT-001',
     hata: 'Test Hatası',
     hataAciklama: 'Bu bir test kaydıdır',
     hataGorsel: '',
@@ -710,6 +725,7 @@ function testDoPost() {
         makine: 'Makine 2',
         po: 'MOCK-PO-002',
         sku: 'MOCK-SKU-002',
+        lot: 'MOCK-LOT-002',
         hata: 'Mock Hata',
         hataAciklama: 'Mock test',
         hataGorsel: '',
