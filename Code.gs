@@ -680,6 +680,13 @@ function checkAndSendNoErrorEmail() {
     
     // Bugünün tarihini al (Türkiye saati)
     const now = new Date();
+    
+    // Pazar günü çalışma yapılmadığı için mail atma (0 = Pazar)
+    if (now.getDay() === 0) {
+      Logger.log('Bugün Pazar günü. Kontrol atlandı, mail gönderilmeyecek.');
+      return;
+    }
+    
     const todayStr = Utilities.formatDate(now, CONFIG.TIMEZONE, 'dd.MM.yyyy');
     
     let hasErrorToday = false;
@@ -798,7 +805,8 @@ function setupDailyNoErrorTrigger() {
   try {
     SpreadsheetApp.getUi().alert(
       '✅ Günlük Kontrol Tetikleyicisi Kuruldu!\n\n' +
-      'Her gün saat 18:00 civarında (Türkiye saati) kontrol yapılacak.\n' +
+      'Pazartesi - Cumartesi günleri saat 18:00 civarında (Türkiye saati) kontrol yapılacak.\n' +
+      'Pazar günleri kontrol yapılmaz ve mail atılmaz.\n' +
       'Eğer o gün hiç hata kaydı girilmemişse, "Hata Çıkmamıştır" maili gönderilecektir.\n\n' +
       'Alıcılar: ' + CONFIG.EMAIL_RECIPIENTS
     );
@@ -961,15 +969,21 @@ function sendWeeklySummaryEmail() {
       const countText = info.count === 0 ? '✅ Hata Yok' : info.count + ' hata';
       dayRowsHtml += `
         <tr style="background:${bgColor};">
-          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:500;color:#334155;">${info.name}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;">${day}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="background:#e2e8f0;border-radius:4px;height:8px;width:100px;overflow:hidden;">
-                <div style="background:${info.count === 0 ? '#22c55e' : '#ef4444'};height:100%;width:${barWidth}%;border-radius:4px;"></div>
-              </div>
-              <span style="color:${countColor};font-weight:600;font-size:13px;">${countText}</span>
-            </div>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font-weight:500;color:#334155;width:95px;">${info.name}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:13px;width:95px;">${day}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;">
+            <table style="border-collapse:collapse;border:none;">
+              <tr>
+                <td style="padding:0;vertical-align:middle;width:110px;">
+                  <div style="background:#e2e8f0;border-radius:4px;height:8px;width:110px;overflow:hidden;">
+                    <div style="background:${info.count === 0 ? '#22c55e' : '#ef4444'};height:100%;width:${barWidth}%;border-radius:4px;"></div>
+                  </div>
+                </td>
+                <td style="padding:0 0 0 24px;vertical-align:middle;">
+                  <span style="color:${countColor};font-weight:600;font-size:13px;white-space:nowrap;">${countText}</span>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>`;
     });
@@ -1026,28 +1040,30 @@ function sendWeeklySummaryEmail() {
       <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;">
         <table style="width:100%;border-collapse:collapse;">
           <tr>
-            <td style="padding:10px;text-align:center;width:25%;">
-              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div style="font-size:28px;font-weight:700;color:${totalErrors === 0 ? '#16a34a' : '#dc2626'};">${totalErrors}</div>
-                <div style="font-size:12px;color:#64748b;margin-top:4px;">Toplam Hata</div>
+            <td style="padding:6px;text-align:center;width:25%;vertical-align:top;">
+              <div style="background:white;border-radius:10px;padding:16px 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid #e2e8f0;min-height:85px;">
+                <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Toplam Hata</div>
+                <div style="font-size:26px;font-weight:700;color:${totalErrors === 0 ? '#16a34a' : '#dc2626'};line-height:1.1;">${totalErrors}</div>
               </div>
             </td>
-            <td style="padding:10px;text-align:center;width:25%;">
-              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div style="font-size:28px;font-weight:700;color:#16a34a;">${noErrorDays.length}</div>
-                <div style="font-size:12px;color:#64748b;margin-top:4px;">Hatasız Gün</div>
+            <td style="padding:6px;text-align:center;width:25%;vertical-align:top;">
+              <div style="background:white;border-radius:10px;padding:16px 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid #e2e8f0;min-height:85px;">
+                <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Hatasız Gün</div>
+                <div style="font-size:26px;font-weight:700;color:#16a34a;line-height:1.1;">${noErrorDays.length}</div>
               </div>
             </td>
-            <td style="padding:10px;text-align:center;width:25%;">
-              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div style="font-size:16px;font-weight:700;color:#ea580c;">${topMachine}</div>
-                <div style="font-size:12px;color:#64748b;margin-top:4px;">En Çok Hata (${topMachineCount})</div>
+            <td style="padding:6px;text-align:center;width:25%;vertical-align:top;">
+              <div style="background:white;border-radius:10px;padding:16px 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid #e2e8f0;min-height:85px;">
+                <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">En Çok Hata</div>
+                <div style="font-size:15px;font-weight:700;color:#ea580c;line-height:1.2;">${topMachine}</div>
+                ${topMachineCount > 0 ? `<div style="font-size:12px;color:#9a3412;margin-top:4px;font-weight:600;">(${topMachineCount})</div>` : ''}
               </div>
             </td>
-            <td style="padding:10px;text-align:center;width:25%;">
-              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div style="font-size:14px;font-weight:700;color:#7c3aed;">${topDefect}</div>
-                <div style="font-size:12px;color:#64748b;margin-top:4px;">En Sık Hata (${topDefectCount})</div>
+            <td style="padding:6px;text-align:center;width:25%;vertical-align:top;">
+              <div style="background:white;border-radius:10px;padding:16px 10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border:1px solid #e2e8f0;min-height:85px;">
+                <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">En Sık Hata</div>
+                <div style="font-size:14px;font-weight:700;color:#7c3aed;line-height:1.2;">${topDefect}</div>
+                ${topDefectCount > 0 ? `<div style="font-size:12px;color:#6d28d9;margin-top:4px;font-weight:600;">(${topDefectCount})</div>` : ''}
               </div>
             </td>
           </tr>
@@ -1328,3 +1344,81 @@ function testDoPost() {
   }
 }
 
+// ========================================
+// 🧪 TEST FONKSİYONLARI (Sadece Sizin Mailinize Gönderir)
+// ========================================
+
+/**
+ * TEST: "Hata Çıkmamıştır" mailini sadece size gönderir.
+ * Apps Script editöründen bu fonksiyonu seçip çalıştırın.
+ */
+function TEST_gunlukHataYokMaili() {
+  const originalRecipients = CONFIG.EMAIL_RECIPIENTS;
+  CONFIG.EMAIL_RECIPIENTS = 'beste.akillilar@kalisan.com.tr';
+  
+  try {
+    checkAndSendNoErrorEmail();
+    Logger.log('✅ TEST: Günlük "hata çıkmamıştır" maili sadece size gönderildi.');
+    SpreadsheetApp.getUi().alert(
+      '✅ TEST Başarılı!\n\n' +
+      '"Hata Çıkmamıştır" maili sadece beste.akillilar@kalisan.com.tr adresine gönderildi.\n\n' +
+      'Lütfen mail kutunuzu kontrol edin.\n' +
+      'NOT: Bugün database\'de kayıt varsa mail gönderilmez (çünkü hata var demektir).'
+    );
+  } catch (error) {
+    Logger.log('TEST Hatası: ' + error.toString());
+    SpreadsheetApp.getUi().alert('❌ TEST Başarısız!\n\nHata: ' + error.toString());
+  } finally {
+    CONFIG.EMAIL_RECIPIENTS = originalRecipients;
+  }
+}
+
+/**
+ * TEST: Haftalık özet mailini sadece size gönderir.
+ * Apps Script editöründen bu fonksiyonu seçip çalıştırın.
+ */
+function TEST_haftalikOzetMaili() {
+  const originalRecipients = CONFIG.EMAIL_RECIPIENTS;
+  CONFIG.EMAIL_RECIPIENTS = 'beste.akillilar@kalisan.com.tr';
+  
+  try {
+    sendWeeklySummaryEmail();
+    Logger.log('✅ TEST: Haftalık özet maili sadece size gönderildi.');
+    SpreadsheetApp.getUi().alert(
+      '✅ TEST Başarılı!\n\n' +
+      'Haftalık özet maili sadece beste.akillilar@kalisan.com.tr adresine gönderildi.\n\n' +
+      'Lütfen mail kutunuzu kontrol edin.'
+    );
+  } catch (error) {
+    Logger.log('TEST Hatası: ' + error.toString());
+    SpreadsheetApp.getUi().alert('❌ TEST Başarısız!\n\nHata: ' + error.toString());
+  } finally {
+    CONFIG.EMAIL_RECIPIENTS = originalRecipients;
+  }
+}
+
+/**
+ * TEST: "Hata Çıkmamıştır" mailini zorla gönderir (bugün kayıt olsa bile).
+ * Mail tasarımını görmek için kullanın.
+ */
+function TEST_zorlaHataYokMaili() {
+  const originalRecipients = CONFIG.EMAIL_RECIPIENTS;
+  CONFIG.EMAIL_RECIPIENTS = 'beste.akillilar@kalisan.com.tr';
+  
+  try {
+    const now = new Date();
+    const todayStr = Utilities.formatDate(now, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+    sendNoErrorEmail(todayStr);
+    Logger.log('✅ TEST: "Hata çıkmamıştır" maili zorla gönderildi.');
+    SpreadsheetApp.getUi().alert(
+      '✅ TEST Başarılı!\n\n' +
+      '"Hata Çıkmamıştır" maili zorla gönderildi (database kontrolü atlandı).\n' +
+      'beste.akillilar@kalisan.com.tr adresini kontrol edin.'
+    );
+  } catch (error) {
+    Logger.log('TEST Hatası: ' + error.toString());
+    SpreadsheetApp.getUi().alert('❌ TEST Başarısız!\n\nHata: ' + error.toString());
+  } finally {
+    CONFIG.EMAIL_RECIPIENTS = originalRecipients;
+  }
+}
