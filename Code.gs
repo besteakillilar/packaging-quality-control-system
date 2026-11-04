@@ -664,6 +664,576 @@ function setupAllSheets() {
   SpreadsheetApp.getUi().alert('🎉 Tüm sayfalar başarıyla oluşturuldu!');
 }
 
+// ========================================
+// Günlük "Hata Çıkmamıştır" Mail Kontrolü
+// ========================================
+
+/**
+ * Her gün saat 17:55'te çalışır.
+ * O gün database'de hiç hata kaydı yoksa
+ * "Bugün hata çıkmamıştır" e-postası gönderir.
+ */
+function checkAndSendNoErrorEmail() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const dbSheet = ss.getSheetByName(CONFIG.DATABASE_SHEET_NAME);
+    
+    // Bugünün tarihini al (Türkiye saati)
+    const now = new Date();
+    const todayStr = Utilities.formatDate(now, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+    
+    let hasErrorToday = false;
+    
+    // Database'de bugüne ait kayıt var mı kontrol et
+    if (dbSheet && dbSheet.getLastRow() >= 2) {
+      const dataRange = dbSheet.getRange(2, 1, dbSheet.getLastRow() - 1, 1); // Sadece Tarih sütunu
+      const dates = dataRange.getValues();
+      
+      for (let i = 0; i < dates.length; i++) {
+        let rowDate = dates[i][0];
+        
+        // Date objesi ise string'e çevir
+        if (rowDate instanceof Date) {
+          rowDate = Utilities.formatDate(rowDate, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+        }
+        
+        if (rowDate === todayStr) {
+          hasErrorToday = true;
+          break;
+        }
+      }
+    }
+    
+    // Bugün hiç hata kaydı yoksa mail gönder
+    if (!hasErrorToday) {
+      sendNoErrorEmail(todayStr);
+      Logger.log('Bugün (' + todayStr + ') hata kaydı bulunamadı. "Hata çıkmamıştır" maili gönderildi.');
+    } else {
+      Logger.log('Bugün (' + todayStr + ') hata kaydı mevcut. Mail gönderilmedi.');
+    }
+  } catch (error) {
+    Logger.log('checkAndSendNoErrorEmail Hatası: ' + error.toString());
+  }
+}
+
+/**
+ * "Bugün hata çıkmamıştır" e-postası gönderir
+ */
+function sendNoErrorEmail(todayStr) {
+  const subject = `✅ ${todayStr} | Paketleme Kalite Kontrol - Hata Çıkmamıştır`;
+  
+  const htmlBody = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 10px 10px 0 0;">
+        <h1 style="margin: 0; font-size: 20px;">✅ Paketleme Kalite Kontrol - Günlük Rapor</h1>
+        <p style="margin: 5px 0 0; opacity: 0.9;">${todayStr}</p>
+      </div>
+
+      <div style="background: #f0fdf4; padding: 30px; border: 1px solid #bbf7d0; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+        <h2 style="color: #166534; margin: 0 0 10px;">Hata Çıkmamıştır</h2>
+        <p style="color: #15803d; font-size: 16px; margin: 0;">
+          Bugün (${todayStr}) paketleme kalite kontrol sürecinde herhangi bir hata kaydı oluşturulmamıştır.
+        </p>
+      </div>
+
+      <div style="background: #1e293b; color: #94a3b8; padding: 15px; text-align: center; border-radius: 0 0 10px 10px; font-size: 12px;">
+        Bu e-posta Kalite Kontrol Sistemi tarafından otomatik olarak gönderilmiştir.
+      </div>
+    </div>
+  `;
+  
+  const plainBody = `Paketleme Kalite Kontrol - Günlük Rapor\n\n` +
+    `Tarih: ${todayStr}\n\n` +
+    `Bugün paketleme kalite kontrol sürecinde herhangi bir hata kaydı oluşturulmamıştır.\n\n` +
+    `Bu e-posta otomatik olarak gönderilmiştir.`;
+  
+  const recipients = CONFIG.EMAIL_RECIPIENTS
+    .split(',')
+    .map(e => e.trim())
+    .filter(Boolean);
+  
+  recipients.forEach(recipient => {
+    try {
+      MailApp.sendEmail({
+        to: recipient,
+        subject: subject,
+        body: plainBody,
+        htmlBody: htmlBody,
+        name: 'Paketleme Kalite Kontrol'
+      });
+      Logger.log('SUCCESS: "Hata çıkmamıştır" maili gönderildi: ' + recipient);
+    } catch (e) {
+      Logger.log('ERROR: Mail gönderilemedi: ' + recipient + '. Hata: ' + e.toString());
+    }
+  });
+}
+
+/**
+ * Günlük 18:00 tetikleyicisini kurar.
+ * Bu fonksiyonu Apps Script editöründen BİR KEZ çalıştırın.
+ * Çalıştırdıktan sonra her gün saat 18:00'de otomatik olarak kontrol yapılacaktır.
+ */
+function setupDailyNoErrorTrigger() {
+  // Önce mevcut tetikleyicileri temizle (çift tetikleyici olmasın)
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'checkAndSendNoErrorEmail') {
+      ScriptApp.deleteTrigger(trigger);
+      Logger.log('Mevcut tetikleyici silindi.');
+    }
+  });
+  
+  // Yeni tetikleyici oluştur - Her gün 18:00'de çalışsın
+  ScriptApp.newTrigger('checkAndSendNoErrorEmail')
+    .timeBased()
+    .atHour(18)
+    .nearMinute(0)
+    .everyDays(1)
+    .inTimezone(CONFIG.TIMEZONE)
+    .create();
+  
+  Logger.log('Günlük 18:00 tetikleyicisi başarıyla kuruldu!');
+  
+  try {
+    SpreadsheetApp.getUi().alert(
+      '✅ Günlük Kontrol Tetikleyicisi Kuruldu!\n\n' +
+      'Her gün saat 18:00 civarında (Türkiye saati) kontrol yapılacak.\n' +
+      'Eğer o gün hiç hata kaydı girilmemişse, "Hata Çıkmamıştır" maili gönderilecektir.\n\n' +
+      'Alıcılar: ' + CONFIG.EMAIL_RECIPIENTS
+    );
+  } catch (uiError) {
+    // Web uygulaması üzerinden çalıştırıldıysa UI kullanılamaz
+    Logger.log('UI alert gösterilemedi (muhtemelen trigger üzerinden çalışıyor).');
+  }
+}
+
+/**
+ * Tetikleyiciyi kaldırır
+ */
+function removeDailyNoErrorTrigger() {
+  const triggers = ScriptApp.getProjectTriggers();
+  let removed = 0;
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'checkAndSendNoErrorEmail') {
+      ScriptApp.deleteTrigger(trigger);
+      removed++;
+    }
+  });
+  
+  Logger.log(removed + ' adet tetikleyici kaldırıldı.');
+  
+  try {
+    SpreadsheetApp.getUi().alert('✅ Günlük kontrol tetikleyicisi kaldırıldı. (' + removed + ' adet)');
+  } catch (uiError) {
+    Logger.log('UI alert gösterilemedi.');
+  }
+}
+
+// ========================================
+// Haftalık Özet Mail Sistemi
+// ========================================
+
+/**
+ * Cumartesi günü 16:15'te çalışır.
+ * Pazartesi'den Cumartesi'ye kadar olan haftanın tüm kayıtlarını inceler
+ * ve özet rapor e-postası gönderir.
+ */
+function sendWeeklySummaryEmail() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const dbSheet = ss.getSheetByName(CONFIG.DATABASE_SHEET_NAME);
+    
+    const now = new Date();
+    
+    // Bu haftanın Pazartesi ve Cumartesi tarihlerini hesapla
+    const today = new Date(now);
+    const dayOfWeek = today.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+    
+    // Pazartesi'yi bul (Cumartesi'den 5 gün geri)
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setHours(0, 0, 0, 0);
+    
+    // Cumartesi (bugün)
+    const saturday = new Date(today);
+    saturday.setHours(23, 59, 59, 999);
+    
+    const mondayStr = Utilities.formatDate(monday, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+    const saturdayStr = Utilities.formatDate(saturday, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+    
+    // Haftanın tüm gün tarihlerini oluştur (Pzt-Cmt)
+    const weekDays = [];
+    for (let d = 0; d < 6; d++) {
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + d);
+      weekDays.push(Utilities.formatDate(day, CONFIG.TIMEZONE, 'dd.MM.yyyy'));
+    }
+    
+    const dayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+    
+    // Database'den bu haftanın kayıtlarını topla
+    let weeklyRecords = [];
+    
+    if (dbSheet && dbSheet.getLastRow() >= 2) {
+      const dataRange = dbSheet.getRange(2, 1, dbSheet.getLastRow() - 1, HEADERS.length);
+      const allData = dataRange.getValues();
+      
+      allData.forEach(row => {
+        let rowDate = row[0];
+        if (rowDate instanceof Date) {
+          rowDate = Utilities.formatDate(rowDate, CONFIG.TIMEZONE, 'dd.MM.yyyy');
+        }
+        
+        if (weekDays.includes(rowDate)) {
+          weeklyRecords.push({
+            tarih: rowDate,
+            makine: row[1] || '-',
+            po: row[2] || '-',
+            sku: row[3] || '-',
+            lot: row[4] || '-',
+            hata: row[5] || '-',
+            hataAciklama: row[6] || '-'
+          });
+        }
+      });
+    }
+    
+    // İstatistikleri hesapla
+    const totalErrors = weeklyRecords.length;
+    
+    // Gün bazlı dağılım
+    const dayDistribution = {};
+    weekDays.forEach((day, i) => {
+      dayDistribution[day] = { name: dayNames[i], count: 0 };
+    });
+    weeklyRecords.forEach(r => {
+      if (dayDistribution[r.tarih]) {
+        dayDistribution[r.tarih].count++;
+      }
+    });
+    
+    // Hatasız günler
+    const noErrorDays = weekDays.filter(day => dayDistribution[day].count === 0);
+    
+    // Makine bazlı dağılım
+    const machineDistribution = {};
+    weeklyRecords.forEach(r => {
+      machineDistribution[r.makine] = (machineDistribution[r.makine] || 0) + 1;
+    });
+    
+    // Hata türü bazlı dağılım
+    const defectDistribution = {};
+    weeklyRecords.forEach(r => {
+      defectDistribution[r.hata] = (defectDistribution[r.hata] || 0) + 1;
+    });
+    
+    // En çok hata veren makine
+    let topMachine = '-';
+    let topMachineCount = 0;
+    Object.keys(machineDistribution).forEach(m => {
+      if (machineDistribution[m] > topMachineCount) {
+        topMachine = m;
+        topMachineCount = machineDistribution[m];
+      }
+    });
+    
+    // En sık hata türü
+    let topDefect = '-';
+    let topDefectCount = 0;
+    Object.keys(defectDistribution).forEach(d => {
+      if (defectDistribution[d] > topDefectCount) {
+        topDefect = d;
+        topDefectCount = defectDistribution[d];
+      }
+    });
+    
+    // HTML mail oluştur
+    const subject = `📊 Haftalık Özet | ${mondayStr} - ${saturdayStr} | Paketleme Kalite Kontrol`;
+    
+    // Gün bazlı tablo satırları
+    let dayRowsHtml = '';
+    weekDays.forEach(day => {
+      const info = dayDistribution[day];
+      const barWidth = totalErrors > 0 ? Math.round((info.count / totalErrors) * 100) : 0;
+      const bgColor = info.count === 0 ? '#f0fdf4' : '#fff';
+      const countColor = info.count === 0 ? '#16a34a' : '#dc2626';
+      const countText = info.count === 0 ? '✅ Hata Yok' : info.count + ' hata';
+      dayRowsHtml += `
+        <tr style="background:${bgColor};">
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:500;color:#334155;">${info.name}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;">${day}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="background:#e2e8f0;border-radius:4px;height:8px;width:100px;overflow:hidden;">
+                <div style="background:${info.count === 0 ? '#22c55e' : '#ef4444'};height:100%;width:${barWidth}%;border-radius:4px;"></div>
+              </div>
+              <span style="color:${countColor};font-weight:600;font-size:13px;">${countText}</span>
+            </div>
+          </td>
+        </tr>`;
+    });
+    
+    // Makine bazlı tablo satırları
+    let machineRowsHtml = '';
+    const sortedMachines = Object.entries(machineDistribution).sort((a, b) => b[1] - a[1]);
+    sortedMachines.forEach(([machine, count]) => {
+      const pct = totalErrors > 0 ? Math.round((count / totalErrors) * 100) : 0;
+      machineRowsHtml += `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#334155;">${machine}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:600;text-align:center;">${count}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;text-align:center;">%${pct}</td>
+        </tr>`;
+    });
+    
+    // Hata türü bazlı tablo satırları
+    let defectRowsHtml = '';
+    const sortedDefects = Object.entries(defectDistribution).sort((a, b) => b[1] - a[1]);
+    sortedDefects.forEach(([defect, count]) => {
+      const pct = totalErrors > 0 ? Math.round((count / totalErrors) * 100) : 0;
+      defectRowsHtml += `
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#334155;">${defect}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:600;text-align:center;">${count}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;text-align:center;">%${pct}</td>
+        </tr>`;
+    });
+    
+    // Detay listesi (son 20 kayıt)
+    let detailRowsHtml = '';
+    const recentRecords = weeklyRecords.slice(-20);
+    recentRecords.forEach(r => {
+      detailRowsHtml += `
+        <tr>
+          <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;">${r.tarih}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:12px;">${r.makine}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:12px;">${r.po}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:12px;">${r.sku}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-size:12px;">${r.hata}</td>
+        </tr>`;
+    });
+    
+    const htmlBody = `
+    <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+      <!-- Başlık -->
+      <div style="background: linear-gradient(135deg, #6366f1, #4338ca); color: white; padding: 24px; border-radius: 10px 10px 0 0;">
+        <h1 style="margin: 0; font-size: 22px;">📊 Haftalık Kalite Kontrol Özet Raporu</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 15px;">${mondayStr} — ${saturdayStr}</p>
+      </div>
+
+      <!-- Özet Kartları -->
+      <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:10px;text-align:center;width:25%;">
+              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="font-size:28px;font-weight:700;color:${totalErrors === 0 ? '#16a34a' : '#dc2626'};">${totalErrors}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:4px;">Toplam Hata</div>
+              </div>
+            </td>
+            <td style="padding:10px;text-align:center;width:25%;">
+              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="font-size:28px;font-weight:700;color:#16a34a;">${noErrorDays.length}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:4px;">Hatasız Gün</div>
+              </div>
+            </td>
+            <td style="padding:10px;text-align:center;width:25%;">
+              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="font-size:16px;font-weight:700;color:#ea580c;">${topMachine}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:4px;">En Çok Hata (${topMachineCount})</div>
+              </div>
+            </td>
+            <td style="padding:10px;text-align:center;width:25%;">
+              <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="font-size:14px;font-weight:700;color:#7c3aed;">${topDefect}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:4px;">En Sık Hata (${topDefectCount})</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Gün Bazlı Dağılım -->
+      <div style="background:white;padding:20px;border:1px solid #e2e8f0;border-top:none;">
+        <h3 style="margin:0 0 12px;color:#1e293b;font-size:16px;">📅 Gün Bazlı Dağılım</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          ${dayRowsHtml}
+        </table>
+      </div>
+
+      <!-- Makine Bazlı Dağılım -->
+      ${totalErrors > 0 ? `
+      <div style="background:white;padding:20px;border:1px solid #e2e8f0;border-top:none;">
+        <h3 style="margin:0 0 12px;color:#1e293b;font-size:16px;">🔧 Makine Bazlı Dağılım</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="background:#f1f5f9;">
+            <th style="padding:8px 12px;text-align:left;color:#475569;font-size:13px;">Makine</th>
+            <th style="padding:8px 12px;text-align:center;color:#475569;font-size:13px;">Hata Sayısı</th>
+            <th style="padding:8px 12px;text-align:center;color:#475569;font-size:13px;">Oran</th>
+          </tr>
+          ${machineRowsHtml}
+        </table>
+      </div>
+      ` : ''}
+
+      <!-- Hata Türü Dağılımı -->
+      ${totalErrors > 0 ? `
+      <div style="background:white;padding:20px;border:1px solid #e2e8f0;border-top:none;">
+        <h3 style="margin:0 0 12px;color:#1e293b;font-size:16px;">⚠️ Hata Türü Dağılımı</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="background:#f1f5f9;">
+            <th style="padding:8px 12px;text-align:left;color:#475569;font-size:13px;">Hata Türü</th>
+            <th style="padding:8px 12px;text-align:center;color:#475569;font-size:13px;">Sayı</th>
+            <th style="padding:8px 12px;text-align:center;color:#475569;font-size:13px;">Oran</th>
+          </tr>
+          ${defectRowsHtml}
+        </table>
+      </div>
+      ` : ''}
+
+      <!-- Detay Listesi -->
+      ${totalErrors > 0 ? `
+      <div style="background:white;padding:20px;border:1px solid #e2e8f0;border-top:none;">
+        <h3 style="margin:0 0 12px;color:#1e293b;font-size:16px;">📋 Kayıt Detayları${totalErrors > 20 ? ' (Son 20)' : ''}</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="background:#f1f5f9;">
+            <th style="padding:6px 10px;text-align:left;color:#475569;font-size:12px;">Tarih</th>
+            <th style="padding:6px 10px;text-align:left;color:#475569;font-size:12px;">Makine</th>
+            <th style="padding:6px 10px;text-align:left;color:#475569;font-size:12px;">PO</th>
+            <th style="padding:6px 10px;text-align:left;color:#475569;font-size:12px;">SKU</th>
+            <th style="padding:6px 10px;text-align:left;color:#475569;font-size:12px;">Hata</th>
+          </tr>
+          ${detailRowsHtml}
+        </table>
+      </div>
+      ` : `
+      <div style="background:#f0fdf4;padding:30px;border:1px solid #bbf7d0;border-top:none;text-align:center;">
+        <div style="font-size:48px;margin-bottom:10px;">🎉</div>
+        <h2 style="color:#166534;margin:0 0 8px;">Bu Hafta Hiç Hata Kaydı Yok!</h2>
+        <p style="color:#15803d;margin:0;">Tebrikler! Bu hafta paketleme kalite kontrol sürecinde herhangi bir hata tespit edilmemiştir.</p>
+      </div>
+      `}
+
+      <!-- Footer -->
+      <div style="background:#1e293b;color:#94a3b8;padding:15px;text-align:center;border-radius:0 0 10px 10px;font-size:12px;">
+        Bu e-posta Kalite Kontrol Sistemi tarafından otomatik olarak gönderilmiştir.
+      </div>
+    </div>
+    `;
+    
+    // Plain text versiyon
+    let plainBody = `Haftalık Kalite Kontrol Özet Raporu\n` +
+      `Dönem: ${mondayStr} - ${saturdayStr}\n\n` +
+      `Toplam Hata: ${totalErrors}\n` +
+      `Hatasız Gün: ${noErrorDays.length}\n`;
+    
+    if (totalErrors > 0) {
+      plainBody += `En Çok Hata Veren Makine: ${topMachine} (${topMachineCount})\n`;
+      plainBody += `En Sık Hata Türü: ${topDefect} (${topDefectCount})\n\n`;
+      
+      plainBody += `Gün Bazlı:\n`;
+      weekDays.forEach(day => {
+        const info = dayDistribution[day];
+        plainBody += `  ${info.name} (${day}): ${info.count === 0 ? 'Hata Yok ✅' : info.count + ' hata'}\n`;
+      });
+    } else {
+      plainBody += `\nBu hafta hiç hata kaydı oluşturulmamıştır. Tebrikler!\n`;
+    }
+    
+    // Mail gönder
+    const recipients = CONFIG.EMAIL_RECIPIENTS
+      .split(',')
+      .map(e => e.trim())
+      .filter(Boolean);
+    
+    recipients.forEach(recipient => {
+      try {
+        MailApp.sendEmail({
+          to: recipient,
+          subject: subject,
+          body: plainBody,
+          htmlBody: htmlBody,
+          name: 'Paketleme Kalite Kontrol'
+        });
+        Logger.log('SUCCESS: Haftalık özet maili gönderildi: ' + recipient);
+      } catch (e) {
+        Logger.log('ERROR: Haftalık özet gönderilemedi: ' + recipient + '. Hata: ' + e.toString());
+      }
+    });
+    
+    Logger.log('Haftalık özet mail işlemi tamamlandı. Toplam hata: ' + totalErrors);
+  } catch (error) {
+    Logger.log('sendWeeklySummaryEmail Hatası: ' + error.toString());
+  }
+}
+
+/**
+ * Haftalık özet tetikleyicisini kurar.
+ * Her Cumartesi saat 16:15'te çalışır.
+ * Bu fonksiyonu Apps Script editöründen BİR KEZ çalıştırın.
+ */
+function setupWeeklySummaryTrigger() {
+  // Mevcut haftalık tetikleyicileri temizle
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'sendWeeklySummaryEmail') {
+      ScriptApp.deleteTrigger(trigger);
+      Logger.log('Mevcut haftalık tetikleyici silindi.');
+    }
+  });
+  
+  // Yeni tetikleyici: Her Cumartesi 16:15
+  ScriptApp.newTrigger('sendWeeklySummaryEmail')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.SATURDAY)
+    .atHour(16)
+    .nearMinute(15)
+    .inTimezone(CONFIG.TIMEZONE)
+    .create();
+  
+  Logger.log('Haftalık özet tetikleyicisi kuruldu! (Cumartesi 16:15)');
+  
+  try {
+    SpreadsheetApp.getUi().alert(
+      '✅ Haftalık Özet Tetikleyicisi Kuruldu!\n\n' +
+      'Her Cumartesi saat 16:15 civarında (Türkiye saati) haftalık özet raporu gönderilecektir.\n\n' +
+      'Rapor içeriği:\n' +
+      '• Toplam hata sayısı\n' +
+      '• Gün bazlı dağılım\n' +
+      '• Makine bazlı dağılım\n' +
+      '• Hata türü dağılımı\n' +
+      '• Hatasız günler\n' +
+      '• Kayıt detayları\n\n' +
+      'Alıcılar: ' + CONFIG.EMAIL_RECIPIENTS
+    );
+  } catch (uiError) {
+    Logger.log('UI alert gösterilemedi.');
+  }
+}
+
+/**
+ * Haftalık tetikleyiciyi kaldırır
+ */
+function removeWeeklySummaryTrigger() {
+  const triggers = ScriptApp.getProjectTriggers();
+  let removed = 0;
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'sendWeeklySummaryEmail') {
+      ScriptApp.deleteTrigger(trigger);
+      removed++;
+    }
+  });
+  
+  Logger.log(removed + ' adet haftalık tetikleyici kaldırıldı.');
+  
+  try {
+    SpreadsheetApp.getUi().alert('✅ Haftalık özet tetikleyicisi kaldırıldı. (' + removed + ' adet)');
+  } catch (uiError) {
+    Logger.log('UI alert gösterilemedi.');
+  }
+}
+
 /**
  * Add custom menu to spreadsheet
  */
@@ -678,6 +1248,14 @@ function onOpen() {
     .addItem('⚠️ Defect Sayfası Oluştur', 'setupDefectSheet')
     .addSeparator()
     .addItem('🧪 Test Kayıt Ekle', 'testSubmitData')
+    .addSeparator()
+    .addItem('⏰ Günlük Hata Kontrol Tetikleyicisi Kur', 'setupDailyNoErrorTrigger')
+    .addItem('🗑️ Günlük Tetikleyiciyi Kaldır', 'removeDailyNoErrorTrigger')
+    .addItem('🔍 Hata Kontrol Testi (Manuel)', 'checkAndSendNoErrorEmail')
+    .addSeparator()
+    .addItem('📊 Haftalık Özet Tetikleyicisi Kur', 'setupWeeklySummaryTrigger')
+    .addItem('🗑️ Haftalık Tetikleyiciyi Kaldır', 'removeWeeklySummaryTrigger')
+    .addItem('📊 Haftalık Özet Testi (Manuel)', 'sendWeeklySummaryEmail')
     .addToUi();
 }
 
